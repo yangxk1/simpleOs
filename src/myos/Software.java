@@ -15,26 +15,50 @@ import java.util.Scanner;
 import static myos.constant.OsConstant.DISK_BLOCK_QUNTITY;
 import static myos.constant.OsConstant.DISK_BLOCK_SIZE;
 
+@SuppressWarnings("all")
 public class OS {
-    public static RandomAccessFile disk; //模拟磁盘
-    public static FileOperator fileOperator;//文件操作管理
-    public static ProcessCreator processCreator;//进程创建器
-    public static CPU cpu;//CPU
-    public static Memory memory;//内存
-    public static Clock clock;//时钟
+    /**
+     * 磁盘
+     */
+    public static RandomAccessFile disk;
+    /**
+     * 文件操作
+     */
+    public static FileOperator fileOperator;
+    /**
+     * 过程创造者
+     */
+    public static ProcessCreator processCreator;
+    /**
+     * cpu
+     */
+    public static CPU cpu;
+    /**
+     * 内存
+     */
+    public static Memory memory;
+    /**
+     * 时钟
+     */
+    public static Clock clock;
+    /**
+     * 开机状态
+     */
     public static volatile boolean launched;
-    public  MainController mainController;//界面控制类
-    public static OS os;
+    /**
+     * 界面控制类
+     */
+    public  MainController mainController;
     static {
         try {
             initDisk();
+//            RandomAccessFile支持"随机访问"的方式，程序可以直接跳转到文件的任意地方来读写数据。
             disk = new RandomAccessFile(OsConstant.DISK_FILE, "rw");
             memory = new Memory();
             cpu = new CPU();
             clock = new Clock();
             processCreator = new ProcessCreator();
             fileOperator = new FileOperator();
-            os=new OS();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -127,9 +151,7 @@ public class OS {
 
 
     }
-    public static synchronized  OS getInstance( ) throws Exception {
-        return os;
-    }
+
 
     /**
      * 关闭系统资源
