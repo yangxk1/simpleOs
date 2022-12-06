@@ -3,8 +3,12 @@ package myos.utils;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
+
 /**
- * Created by lindanpeng on 2017/10/20.
+ * 延迟项
+ *
+ * @author WTDYang
+ * @date 2022/12/06
  */
 public class DelayItem<T> implements Delayed {
     //时限长度

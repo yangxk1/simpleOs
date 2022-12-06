@@ -1,6 +1,6 @@
 package myos.manager.process;
 
-import myos.OS;
+import myos.Software;
 import myos.constant.OsConstant;
 import myos.manager.memory.Memory;
 import myos.manager.memory.SubArea;
@@ -17,8 +17,8 @@ public class ProcessCreator {
     private Memory memory;
     private CPU cpu;
     public ProcessCreator( ){
-        this.memory= OS.memory;
-        this.cpu=OS.cpu;
+        this.memory= Software.memory;
+        this.cpu= Software.cpu;
     }
     /**
      * 为打开的可执行文件创建进程

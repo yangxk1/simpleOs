@@ -1,4 +1,4 @@
-package myos.ui;
+package myos.vo;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;

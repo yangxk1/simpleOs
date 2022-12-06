@@ -1,4 +1,4 @@
-package myos.ui;
+package myos.vo;
 
 import javafx.beans.property.SimpleStringProperty;
 

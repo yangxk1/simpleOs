@@ -1,6 +1,6 @@
 package myos.manager.filesys;
 
-import myos.OS;
+import myos.Software;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -164,12 +164,12 @@ public class Catalog {
 
     public List<Catalog> list() throws IOException {
         List<Catalog> catalogs=new ArrayList<>();
-        Catalog catalog= OS.fileOperator.readCatalog(catalogBlock);
+        Catalog catalog= Software.fileOperator.readCatalog(catalogBlock);
         int nextBlock=catalog.getStartBlock();
         while(nextBlock!=-1){
-            Catalog c=OS.fileOperator.readCatalog(nextBlock);
+            Catalog c= Software.fileOperator.readCatalog(nextBlock);
             catalogs.add(c);
-            nextBlock=OS.fileOperator.getNextBlock(nextBlock);
+            nextBlock= Software.fileOperator.getNextBlock(nextBlock);
         }
         return  catalogs;
     }

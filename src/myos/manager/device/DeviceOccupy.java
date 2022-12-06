@@ -5,9 +5,12 @@ import myos.utils.DelayItem;
 
 import java.util.concurrent.TimeUnit;
 
+
 /**
- * Created by lindanpeng on 2017/12/28.
  * 设备占用
+ *
+ * @author WTDYang
+ * @date 2022/12/06
  */
 public class DeviceOccupy extends DelayItem<PCB> {
     private String deviceName;

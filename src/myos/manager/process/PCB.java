@@ -16,7 +16,9 @@ public class PCB {
     private int PID;
     //状态
     private String status;
-    //优先级
+    /**
+     * 优先级
+     */
     private int priority;
     //程序计数器，相对于memStart
     private int counter;
@@ -31,10 +33,25 @@ public class PCB {
     private int memEnd;
     //事件
     private int event;
+
+    /**
+     * 优先级随机
+     */
     public PCB(){
         idGenerator++;
         PID=idGenerator;
         priority= (int) (Math.random()*10);
+    }
+
+    /**
+     * 指定优先级
+     *
+     * @param priority 优先级
+     */
+    public PCB(int priority){
+        idGenerator++;
+        PID=idGenerator;
+        this.priority= priority;
     }
 
     public int getPID() {

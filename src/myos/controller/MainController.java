@@ -20,7 +20,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
-import myos.OS;
+import myos.Software;
 import myos.constant.UIResources;
 import myos.manager.device.DeviceOccupy;
 import myos.manager.device.DeviceRequest;
@@ -29,16 +29,13 @@ import myos.manager.filesys.OpenedFile;
 import myos.manager.process.PCB;
 import myos.manager.memory.SubArea;
 import myos.manager.process.Clock;
-import myos.ui.DeviceVo;
-import myos.ui.MyTreeItem;
-import myos.ui.PCBVo;
+import myos.vo.DeviceVo;
+import myos.vo.MyTreeItem;
+import myos.vo.PCBVo;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -83,7 +80,7 @@ public class MainController implements Initializable {
     private TableColumn usingDeviceNameCol;
     @FXML
     private TableColumn usingDevicePIDCol;
-    private OS os;
+    private Software os;
     private UpdateUIThread updateUIThread;
 
     public MainController() throws Exception {
@@ -113,7 +110,7 @@ public class MainController implements Initializable {
 
     /*-------------------响应用户请求------------------------*/
     public void osSwitch() throws Exception {
-        if (!OS.launched) {
+        if (!Software.launched) {
             launchOS();
             cmdView.setEditable(true);
             osSwitchBtn.setStyle("-fx-background-color:#e34040");
@@ -193,7 +190,7 @@ public class MainController implements Initializable {
      * 启动系统
      */
     public void launchOS() throws Exception {
-            OS.launched = true;
+            Software.launched = true;
             os.start();
             initComponent();
             new Thread(updateUIThread).start();
@@ -202,7 +199,7 @@ public class MainController implements Initializable {
          * 关闭系统
          */
     public void closeOs(){
-        OS.launched = false;
+        Software.launched = false;
         os.close();
 
     }
@@ -220,30 +217,30 @@ public class MainController implements Initializable {
 //                System.out.println(instruction[0] + " " + instruction[1]);
                 try {
                     if (instruction[0].equals("create")) {
-                        OS.fileOperator.create(instruction[1], 4);
+                        Software.fileOperator.create(instruction[1], 4);
                         cmdView.appendText("-> 创建文件成功\n");
                     } else if (instruction[0].equals("delete")) {
-                        OS.fileOperator.delete(instruction[1]);
+                        Software.fileOperator.delete(instruction[1]);
                         cmdView.appendText("-> 删除文件成功\n");
                     } else if (instruction[0].equals("type")) {
-                        String content = OS.fileOperator.type(instruction[1]);
+                        String content = Software.fileOperator.type(instruction[1]);
                         cmdView.appendText(content + "\n");
                     }  else if (instruction[0].equals("mkdir")) {
-                        OS.fileOperator.mkdir(instruction[1]);
+                        Software.fileOperator.mkdir(instruction[1]);
                         cmdView.appendText("-> 创建目录成功\n");
                     } else if (instruction[0].equals("rmdir")) {
-                        OS.fileOperator.rmdir(instruction[1]);
+                        Software.fileOperator.rmdir(instruction[1]);
                         cmdView.appendText("-> 删除目录成功\n");
                     } else if (instruction[0].equals("change") && instruction.length == 3) {
                         int newProperty = Integer.valueOf(instruction[2]).intValue();
-                        OS.fileOperator.changeProperty(instruction[1], newProperty);
+                        Software.fileOperator.changeProperty(instruction[1], newProperty);
                         cmdView.appendText("-> 修改文件属性成功\n");
                     } else if (instruction[0].equals("run")) {
-                        OS.fileOperator.run(instruction[1]);
+                        Software.fileOperator.run(instruction[1]);
                         cmdView.appendText("-> 运行文件成功\n");
                     }else if (instruction[0].equals("open")){
-                        OpenedFile openedFile= OS.fileOperator.open(instruction[1],OpenedFile.OP_TYPE_READ_WRITE);
-                        String content=new String(OS.fileOperator.read(openedFile,-1));
+                        OpenedFile openedFile= Software.fileOperator.open(instruction[1],OpenedFile.OP_TYPE_READ_WRITE);
+                        String content=new String(Software.fileOperator.read(openedFile,-1));
                         FXMLLoader fxmlLoader=new FXMLLoader();
                         fxmlLoader.setLocation(getClass().getResource("/notepad.fxml"));
                         Parent parent= fxmlLoader.load();
@@ -266,11 +263,11 @@ public class MainController implements Initializable {
                         notePadStage.show();
                     }
                     else if (instruction[0].equals("copy")){
-                        OS.fileOperator.copy(instruction[1],instruction[2]);
+                        Software.fileOperator.copy(instruction[1],instruction[2]);
                         cmdView.appendText("-> 复制文件成功\n");
                     }
                     else if (instruction[0].equals("format")){
-                        OS.fileOperator.format();
+                        Software.fileOperator.format();
                         cmdView.appendText("-> 格式化硬盘成功\n");
                     }
                     else {
@@ -406,7 +403,7 @@ public class MainController implements Initializable {
      * 更新磁盘使用情况
      */
     public void updateFatView() throws IOException {
-        byte[] fat = OS.fileOperator.getFat();
+        byte[] fat = Software.fileOperator.getFat();
         for (int i = 0; i < fat.length; i++) {
             Pane pane = (Pane) fatView.getChildren().get(i);
             if (fat[i] != 0) {
@@ -426,13 +423,13 @@ public class MainController implements Initializable {
     private class UpdateUIThread implements Runnable {
         @Override
         public void run() {
-            while (OS.launched) {
+            while (Software.launched) {
                 try {
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
                             //更新等待设备进程队列视图
-                            BlockingQueue<DeviceRequest> waitForDevices= OS.cpu.getDeviceManager().getWaitForDevice();
+                            BlockingQueue<DeviceRequest> waitForDevices= Software.cpu.getDeviceManager().getWaitForDevice();
                             ObservableList<DeviceVo> deviceVos=FXCollections.observableArrayList();
                             for (DeviceRequest deviceRequest:waitForDevices){
                                 DeviceVo deviceVo=new DeviceVo(deviceRequest.getDeviceName(),deviceRequest.getPcb().getPID());
@@ -440,7 +437,7 @@ public class MainController implements Initializable {
                             }
                             waitingDeviceQueueView.setItems(deviceVos);
                             //更新使用设备进程队列视图
-                            Queue<DeviceOccupy> usingDevices= OS.cpu.getDeviceManager().getUsingDevices();
+                            Queue<DeviceOccupy> usingDevices= Software.cpu.getDeviceManager().getUsingDevices();
                             ObservableList<DeviceVo> deviceVos2=FXCollections.observableArrayList();
                             for (DeviceOccupy deviceOccupy:usingDevices){
                                 DeviceVo deviceVo=new DeviceVo(deviceOccupy.getDeviceName(),deviceOccupy.getObj().getPID());
@@ -448,13 +445,13 @@ public class MainController implements Initializable {
                             }
                             usingDeviceQueueView.setItems(deviceVos2);
                             //更新进程执行过程视图2
-                            MainController.this.processRunningView.appendText(OS.cpu.getResult() + "\n");
+                            MainController.this.processRunningView.appendText(Software.cpu.getResult() + "\n");
                             //更新系统时钟视图
-                            MainController.this.systemTimeTxt.setText(OS.clock.getSystemTime() + "");
+                            MainController.this.systemTimeTxt.setText(Software.clock.getSystemTime() + "");
                             //更新时间片视图
-                            MainController.this.timesliceTxt.setText(OS.clock.getRestTime() + "");
+                            MainController.this.timesliceTxt.setText(Software.clock.getRestTime() + "");
                             //更新进程队列视图
-                            List<PCB> pcbs = OS.memory.getAllPCB();
+                            List<PCB> pcbs = Software.memory.getAllPCB();
                             List<PCBVo> pcbVos = new ArrayList<>(pcbs.size());
                             for (PCB pcb : pcbs) {
                                 PCBVo pcbVo = new PCBVo(pcb);
@@ -464,7 +461,7 @@ public class MainController implements Initializable {
                             pcbQueueView.setItems(datas);
                             //更新用户区内存视图
                             userAreaView.getChildren().removeAll(userAreaView.getChildren());
-                            List<SubArea> subAreas = OS.memory.getSubAreas();
+                            List<SubArea> subAreas = Software.memory.getSubAreas();
                             for (SubArea subArea : subAreas) {
                                 System.out.println("占用分区的进程ID"+subArea.getTaskNo());
                                 Pane pane = new Pane();
@@ -490,7 +487,7 @@ public class MainController implements Initializable {
         }
     }
 
-    public void setOs(OS os) {
+    public void setOs(Software os) {
         this.os = os;
     }
 }

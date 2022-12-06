@@ -1,6 +1,6 @@
 package myos.manager.process;
 
-import myos.OS;
+import myos.Software;
 import myos.manager.device.DeviceManager;
 import myos.manager.device.DeviceRequest;
 import myos.manager.memory.Memory;
@@ -38,7 +38,7 @@ public class CPU implements Runnable {
     private Memory memory;
     private DeviceManager deviceManager;
     public CPU() {
-        this.memory = OS.memory;
+        this.memory = Software.memory;
         deviceManager=new DeviceManager(this);
     }
 
@@ -283,7 +283,7 @@ public class CPU implements Runnable {
 
     @Override
     public void run() {
-        while (OS.launched) {
+        while (Software.launched) {
             try {
                 Thread.sleep(Clock.TIMESLICE_UNIT);
             } catch (InterruptedException e) {

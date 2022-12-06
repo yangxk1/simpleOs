@@ -4,15 +4,19 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
-import myos.OS;
+import myos.Software;
 import myos.manager.filesys.FileOperator;
 import myos.manager.filesys.OpenedFile;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
+
 /**
- * Created by lindanpeng on 2018/1/3.
+ * 记事本控制器
+ *
+ * @author WTDYang
+ * @date 2022/12/06
  */
 public class NotepadController implements Initializable{
     @FXML
@@ -26,12 +30,12 @@ public class NotepadController implements Initializable{
         this.openedFile=openedFile;
     }
     public void saveFile() throws Exception {
-        FileOperator fileOperator= OS.fileOperator;
+        FileOperator fileOperator= Software.fileOperator;
         String text=content.getText();
         fileOperator.write(openedFile,text.getBytes(),text.length());
     }
     public void closeFile() throws Exception {
-        FileOperator fileOperator= OS.fileOperator;
+        FileOperator fileOperator= Software.fileOperator;
         fileOperator.close(openedFile);
     }
     @Override

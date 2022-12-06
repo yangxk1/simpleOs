@@ -2,9 +2,12 @@ package myos.manager.device;
 
 import myos.manager.process.PCB;
 
+
 /**
- * Created by lindanpeng on 2017/12/28.
- *设备申请
+ * 设备要求
+ *
+ * @author WTDYang
+ * @date 2022/12/06
  */
 public class DeviceRequest {
     private PCB pcb;

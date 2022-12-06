@@ -1,7 +1,11 @@
 package myos.exception;
 
+
 /**
- * Created by lindanpeng on 2017/12/28.
+ * 操作系统异常
+ *
+ * @author WTDYang
+ * @date 2022/12/06
  */
 public class OsException extends  Exception{
 }

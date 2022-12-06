@@ -18,7 +18,7 @@
                         <Insets left="10.0" top="10.0" />
                      </HBox.margin>
                   </Label>
-                  <Pane prefHeight="200.0" prefWidth="200.0">
+                  <Pane prefHeight="200.0" prefWidth="250.0">
                      <children>
                         <Label layoutX="21.0" layoutY="16.0" text="系统时钟：" />
                         <Text fx:id="systemTimeTxt" layoutX="94.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" />

@@ -1,7 +1,6 @@
 package myos.manager.filesys;
 
-import javafx.scene.Parent;
-import myos.OS;
+import myos.Software;
 import myos.constant.OsConstant;
 import myos.controller.MainController;
 import myos.manager.process.ProcessCreator;
@@ -28,8 +27,8 @@ public class FileOperator {
     private MainController mainController;
 
     public FileOperator() throws Exception {
-        this.processCreator = OS.processCreator;
-        this.disk = OS.disk;
+        this.processCreator = Software.processCreator;
+        this.disk = Software.disk;
         this.openedFiles = new ArrayList<>();
 
     }
