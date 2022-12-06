@@ -31,6 +31,7 @@ public class CPU implements Runnable {
     private int DR;
     private int SR;
     private String result="NOP";
+    private String process="";
 
     private static final int NOP = 0x0000;
 
@@ -91,25 +92,42 @@ public class CPU implements Runnable {
      */
     public void execute() {
         result ="NOP";
+        process="";
         if(IR !=0)
         {
             result ="";
             switch (OP) {
-                case 1:switch (DR){  //ADD
-                    case 0:AX++;result +="INC AX, AX="+AX;break;
-                    case 1:BX++;result +="INC BX, BX="+BX;break;
-                    case 2:CX++;result +="INC CX, CX=" +CX;break;
-                    case 3:DX++;result +="INC DX, DX=" +DX;break;
+                case 1:switch (DR){  //ADD 自增一
+                    case 0:AX++;result +="INC AX";
+                        process = "AX="+AX;
+                        break;
+                    case 1:BX++;result +="INC BX";
+                        process = "BX="+BX;
+                        break;
+                    case 2:CX++;result +="INC CX";
+                        process = "CX=" +CX;
+                        break;
+                    case 3:DX++;result +="INC DX";
+                        process = "DX=" +DX;
+                        break;
                     }
                 break;
-                case 2:switch (DR){ //DEC
-                    case 0:AX--;result +="DEC AX, AX="+AX;break;
-                    case 1:BX--;result +="DEC BX, BX="+BX;break;
-                    case 2:CX--;result +="DEC CX, CX="+ CX;break;
-                    case 3:DX--;result +="DEC DX, DX="+ DX;break;
+                case 2:switch (DR){ //DEC 自减一
+                    case 0:AX--;result +="DEC AX";
+                        process = "AX="+AX;
+                        break;
+                    case 1:BX--;result +="DEC BX";
+                        process = "BX="+BX;
+                        break;
+                    case 2:CX--;result +="DEC CX";
+                        process = "CX=" +CX;
+                        break;
+                    case 3:DX--;result +="DEC DX";
+                        process = "DX=" +DX;
+                        break;
                     }
                     break;
-                case 3:              //!??
+                case 3:              //!?? 使用设备
                     String deviceName=null;
                     switch (DR){
                         case 0:deviceName="A";break;
@@ -134,10 +152,18 @@ public class CPU implements Runnable {
 
                     break;
                 case 5:switch (DR){ //MOV
-                    case 0:AX = nextIR;result +="MOV AX,"+nextIR+", AX="+AX;break;
-                    case 1:BX = nextIR;result +="MOV BX,"+nextIR+", BX="+BX;break;
-                    case 2:CX = nextIR;result +="MOV CX,"+nextIR+", CX="+ CX;break;
-                    case 3:DX = nextIR;result +="MOV DX,"+nextIR+", DX="+ DX;break;
+                    case 0:AX = nextIR;result +="MOV AX,"+nextIR;
+                        process = "AX="+AX;
+                        break;
+                    case 1:BX = nextIR;result +="MOV BX,"+nextIR;
+                        process = "BX="+BX;
+                        break;
+                    case 2:CX = nextIR;result +="MOV CX,"+nextIR;
+                        process = "CX="+ CX;
+                        break;
+                    case 3:DX = nextIR;result +="MOV DX,"+nextIR;
+                        process = "DX="+ DX;
+                        break;
                 }
                     break;
                 default:
@@ -305,6 +331,11 @@ public class CPU implements Runnable {
         }
     }
 
+    /**
+     * 得到结果
+     *
+     * @return {@link String}
+     */
     public String getResult()
     {
         String temp;
@@ -317,6 +348,11 @@ public class CPU implements Runnable {
             lock.unlock();
         }
         return temp;
+    }
+    public String getProcess(){
+        if(!"".equals(process))
+        return process+"\n";
+        return "";
     }
 
     public DeviceManager getDeviceManager() {

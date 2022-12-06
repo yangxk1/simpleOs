@@ -446,6 +446,7 @@ public class MainController implements Initializable {
                             usingDeviceQueueView.setItems(deviceVos2);
                             //更新进程执行过程视图2
                             MainController.this.processRunningView.appendText(Software.cpu.getResult() + "\n");
+                            MainController.this.processResultView.appendText(Software.cpu.getProcess());
                             //更新系统时钟视图
                             MainController.this.systemTimeTxt.setText(Software.clock.getSystemTime() + "");
                             //更新时间片视图
