@@ -7,6 +7,7 @@ import myos.manager.memory.Memory;
 import myos.manager.memory.SubArea;
 
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -18,17 +19,31 @@ import java.util.concurrent.locks.ReentrantLock;
 @SuppressWarnings("all")
 public class CPU implements Runnable {
     static ReentrantLock lock = new ReentrantLock();
-    //寄存器组
+    /**
+     * 指令寄存器
+     */
     private int IR;
     private int AX; //0
     private int BX; //1
     private int CX; //2
     private int DX; //3
-    private int PC;
+    /**
+     * 程序计数器
+     */
+    private int IP;
 
     private int nextIR;
+    /**
+     * 操作码
+     */
     private int OP;
+    /**
+     * 操作数
+     */
     private int DR;
+    /**
+     * 设备状态寄存器
+     */
     private int SR;
     private String result="NOP";
     private String process="";
@@ -52,19 +67,21 @@ public class CPU implements Runnable {
         BX=0;
         CX=0;
         DX=0;
-        PC=0;
+        IP=0;
         deviceManager.init();
     }
+
     /**
-     * 取值
+     * 取指令
+     * 取指
      */
     public void fetchInstruction() {
         if (memory.getRunningPCB()==memory.getHangOutPCB()){
             IR=NOP;//NOP不执行
         }else{
             byte[] userArea = memory.getUserArea();
-            IR = userArea[PC];
-            PC++;
+            IR = userArea[IP];
+            IP++;
         }
         System.out.println("取指完成，开始运行指令"+IR);
     }
@@ -81,8 +98,8 @@ public class CPU implements Runnable {
         if(OP == 5)
         {
             byte[] userArea = memory.getUserArea();
-            nextIR = userArea[PC];
-            PC++;
+            nextIR = userArea[IP];
+            IP++;
         }
         System.out.println("译码完成");
     }
@@ -127,24 +144,23 @@ public class CPU implements Runnable {
                         break;
                     }
                     break;
-                case 3:              //!?? 使用设备
+                case 3:              //! 使用设备
                     String deviceName=null;
                     switch (DR){
                         case 0:deviceName="A";break;
                         case 1:deviceName="B";break;
                         case 2:deviceName="C";break;
                     }
-
-                    result +="! Device: "+DR+", Time:"+SR;
+                    result +="使用设备: "+DR+"："+deviceName+"时长为:"+SR;
                     DeviceRequest deviceRequest=new DeviceRequest();
                     deviceRequest.setDeviceName(deviceName);
-                    deviceRequest.setWorkTime(SR*5000);
+                    deviceRequest.setWorkTime(SR*1000);
                     deviceRequest.setPcb(memory.getRunningPCB());
                     deviceManager.requestDevice(deviceRequest);
                     //阻塞进程
                     block();
+                    //重新调度
                     dispatch();
-
                     break;
                 case 4:result += "END";
                         destroy();    //END
@@ -167,32 +183,26 @@ public class CPU implements Runnable {
                 }
                     break;
                 default:
-                    return;
+                    throw new RuntimeException("未知指令");
             }
         }
-        //TODO 如果是end指令就进程调度
-        //System.out.println("指令"+IR+"运行完毕");
 
     }
     /**
      * 进程调度,将进程从就绪态恢复到运行态
-     * FIFO
      */
     public void dispatch() {
-        // TODO 进程调度算法 完善调度算法
         PCB pcb1= memory.getRunningPCB();//当前运行的进程
-        PCB pcb2=memory.getWaitPCB().poll();//取出队首，同时删除队首
-            if (pcb2==null){
-                //没有就绪进程了
-                pcb2=memory.getRunningPCB();
-            }
-            //如果第一个就绪进程是闲逛进程且还有其他的就绪进程
-            if (pcb2==memory.getHangOutPCB()&&memory.getWaitPCB().size()>0){
-                memory.getWaitPCB().offer(pcb2);
-                pcb2=memory.getWaitPCB().poll();
-            }
 
-            memory.setRunningPCB(pcb2);
+        //调度算法
+        PCB pcb2= null;
+        try {
+            pcb2 = schedule();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        memory.setRunningPCB(pcb2);
             pcb2.setStatus(PCB.STATUS_RUN);
             //保存现场
             saveContext(pcb1);
@@ -201,6 +211,37 @@ public class CPU implements Runnable {
             System.out.println("要运行:"+pcb2.getPID());
     }
 
+    /**
+     * CPU调度算法
+     * 优先级调度算法+时间片轮询
+     * Linux0.11内核改造
+     */
+    PCB schedule() throws Exception {
+        //取出队首，同时删除队首
+        PCB next=memory.getWaitPCB().poll();
+        if (next==null){
+            //没有就绪进程了
+            next=memory.getRunningPCB();
+        }
+        //如果第一个就绪进程是闲逛进程且还有其他的就绪进程
+        if (next==memory.getHangOutPCB()&&memory.getWaitPCB().size()>0){
+            //再次取头
+            PCB pcb = memory.getWaitPCB().poll();
+            //首至尾
+            memory.getWaitPCB().offer(next);
+            next = pcb;
+        }
+        //修改counter 让阻塞态的counter增加，也就是提高其优先级，当阻塞结束时就可以优先被调用
+        if(next.getCounter() == 0){
+            Queue<PCB> blockPCB = memory.getBlockPCB();
+            blockPCB.forEach((item)->{
+                item.setCounter(
+                        item.getCounter() >> 1+ item.getPriority()
+                );
+            });
+        }
+        return next;
+    }
 
     /**
      * 进程撤销
@@ -286,8 +327,7 @@ public class CPU implements Runnable {
      * @param pcb
      */
     private void  saveContext(PCB pcb){
-     //   System.out.println("保留现场");
-        pcb.setCounter(PC);
+        pcb.setIP(IP);
         pcb.setAX(this.AX);
         pcb.setBX(this.BX);
         pcb.setCX(this.CX);
@@ -298,13 +338,12 @@ public class CPU implements Runnable {
      * 恢复现场
      */
     private void recoveryContext(PCB pcb){
-        System.out.println("恢复现场");
         pcb.setStatus(PCB.STATUS_RUN);
         this.AX=pcb.getAX();
         this.BX=pcb.getBX();
         this.DX=pcb.getDX();
         this.CX=pcb.getCX();
-        this.PC=pcb.getCounter();
+        this.IP=pcb.getIP();
     }
 
     @Override
@@ -317,17 +356,17 @@ public class CPU implements Runnable {
             }
             lock.lock();
             try {
+                //取指
                 fetchInstruction();
+                //译码
                 identifyInstruction();
+                //执行
                 execute();
-//                System.out.println("就绪队列队头进程："+memory.getWaitPCB().peek().getPID());
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 lock.unlock();
             }
-
-
         }
     }
 

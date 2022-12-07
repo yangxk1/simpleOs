@@ -5,6 +5,7 @@ import myos.manager.process.PCB;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * Created by lindanpeng on 2017/12/12.
@@ -27,8 +28,10 @@ public class Memory {
     private byte[] userArea;
     public Memory() {
         subAreas =Collections.synchronizedList(new LinkedList<>());
-        waitPCB =  new LinkedList<>();
-        blockPCB = new LinkedList<>();
+        waitPCB = new PriorityBlockingQueue<>();
+        blockPCB = new PriorityBlockingQueue<>();
+//        waitPCB =  new LinkedList<>();
+//        blockPCB = new LinkedList<>();
         hangOutPCB=new PCB();
         userArea = new byte[OsConstant.USER_AREA_SIZE];
     }

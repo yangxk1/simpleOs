@@ -275,6 +275,12 @@
                    </HBox>
                   <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
                     <items>
+                        <TableView fx:id="usingDeviceQueueView" prefHeight="30.0" prefWidth="296.0">
+                            <columns>
+                                <TableColumn fx:id="usingDeviceNameCol" prefWidth="182.0" text="设备名称" />
+                                <TableColumn fx:id="usingDevicePIDCol" prefWidth="161.0" text="占用的进程" />
+                            </columns>
+                        </TableView>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="30.0" prefWidth="160.0">
                            <children>
                               <TableView fx:id="waitingDeviceQueueView" layoutX="55.0" layoutY="-42.0" prefHeight="141.0" prefWidth="294.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -285,12 +291,6 @@
                               </TableView>
                            </children>
                         </AnchorPane>
-                        <TableView fx:id="usingDeviceQueueView" prefHeight="30.0" prefWidth="296.0">
-                           <columns>
-                              <TableColumn fx:id="usingDeviceNameCol" prefWidth="182.0" text="设备名称" />
-                              <TableColumn fx:id="usingDevicePIDCol" prefWidth="161.0" text="占用的进程" />
-                           </columns>
-                        </TableView>
                     </items>
                   </SplitPane>
                </children>

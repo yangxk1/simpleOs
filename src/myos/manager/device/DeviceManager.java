@@ -31,9 +31,9 @@ public class DeviceManager{
     private BlockingQueue<DeviceRequest> waitForDevice;
 
     public DeviceManager(CPU cpu){
-        a=new A(2);//A设备2个
-        b=new B(3);//B设备3个
-        c=new C(3);//C设备3个
+        a=new A(1);//A设备2个
+        b=new B(1);//B设备3个
+        c=new C(2);//C设备3个
         usingDevices =new DelayQueue<>();
         waitForDevice=new ArrayBlockingQueue<>(20);
         this.cpu=cpu;
