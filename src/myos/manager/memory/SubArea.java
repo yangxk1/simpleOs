@@ -1,18 +1,36 @@
 package myos.manager.memory;
 
+
 /**
- * Created by lindanpeng on 2017/12/24.
+ * 内存分区
+ *
+ * @author WTDYang
+ * @date 2022/12/07
  */
- public class SubArea {
-    public  static final int STATUS_FREE=0;//分区空闲
-    public  static final int STATUS_BUSY=1;//分区被使用
-     //开始地址
+public class SubArea {
+    /**
+     * 状态空闲
+     */
+    public  static final int STATUS_FREE=0;
+    /**
+     * 分区被使用
+     */
+    public  static final int STATUS_BUSY=1;
+    /**
+     * 开始地址
+     */
      private int startAdd;
-     //分区大小
+    /**
+     * 分区大小
+     */
      private int size;
-     //分区状态
+    /**
+     * 分区状态
+     */
     private int status;
-    //作业号
+    /**
+     * 任务号
+     */
     private int taskNo;
 
     public int getStartAdd() {

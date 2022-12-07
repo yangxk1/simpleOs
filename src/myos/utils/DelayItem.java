@@ -33,15 +33,20 @@ public class DelayItem<T> implements Delayed {
 
     @Override
     public int compareTo(Delayed o) {
-        if(o == null || ! (o instanceof DelayItem)) return 1;
-        if(o == this) return 0;
-        DelayItem delayItem=(DelayItem) o;
-        if (this.expireTime>delayItem.expireTime)
+        if(!(o instanceof DelayItem)) {
             return 1;
-        else if (this.expireTime==delayItem.expireTime)
+        }
+        if(o == this) {
             return 0;
-        else
+        }
+        DelayItem delayItem=(DelayItem) o;
+        if (this.expireTime>delayItem.expireTime) {
+            return 1;
+        } else if (this.expireTime==delayItem.expireTime) {
+            return 0;
+        } else {
             return -1;
+        }
 
     }
 

@@ -30,9 +30,9 @@ public class Memory {
         subAreas =Collections.synchronizedList(new LinkedList<>());
         waitPCB = new PriorityBlockingQueue<>();
         blockPCB = new PriorityBlockingQueue<>();
-//        waitPCB =  new LinkedList<>();
-//        blockPCB = new LinkedList<>();
-        hangOutPCB=new PCB();
+        //闲逛进程的优先值最低
+        hangOutPCB=new PCB(0);
+        //初始化内存
         userArea = new byte[OsConstant.USER_AREA_SIZE];
     }
     public void init(){

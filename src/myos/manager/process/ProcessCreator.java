@@ -9,9 +9,12 @@ import java.util.ListIterator;
 
 import static myos.manager.process.CPU.lock;
 
+
 /**
- * Created by lindanpeng on 2017/12/24.
- * 进程创建者
+ * 创建进程
+ *
+ * @author WTDYang
+ * @date 2022/12/07
  */
 public class ProcessCreator {
     private Memory memory;
@@ -20,6 +23,7 @@ public class ProcessCreator {
         this.memory= Software.memory;
         this.cpu= Software.cpu;
     }
+    //TODO 内存管理
     /**
      * 为打开的可执行文件创建进程
      * @param program

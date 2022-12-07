@@ -4,7 +4,7 @@ import myos.manager.process.PCB;
 
 
 /**
- * 设备要求
+ * 设备请求
  *
  * @author WTDYang
  * @date 2022/12/06

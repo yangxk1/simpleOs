@@ -7,8 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by lindanpeng on 2017/12/6.
- *目录/文件登记项
+ * 目录
+ * 目录/文件登记项
+ *
+ * @author WTDYang
+ * @date 2022/12/07
  */
 public class Catalog {
     //目录项占用空间

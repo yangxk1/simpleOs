@@ -151,10 +151,10 @@ public class CPU implements Runnable {
                         case 1:deviceName="B";break;
                         case 2:deviceName="C";break;
                     }
-                    result +="使用设备: "+DR+"："+deviceName+"时长为:"+SR;
+                    result +="use device:"+DR+":"+deviceName+";Time:"+SR*5;
                     DeviceRequest deviceRequest=new DeviceRequest();
                     deviceRequest.setDeviceName(deviceName);
-                    deviceRequest.setWorkTime(SR*1000);
+                    deviceRequest.setWorkTime(SR*5000);
                     deviceRequest.setPcb(memory.getRunningPCB());
                     deviceManager.requestDevice(deviceRequest);
                     //阻塞进程

@@ -6,18 +6,12 @@ import javafx.scene.image.ImageView;
 
 
 /**
- * 文件扩展名
+ * 文件扩展名查找ui图标
  *
  * @author WTDYang
  * @date 2022/12/05
  */
 public class UIResources {
-//    public static final Node directoryIcon;
-//    public static final Node fileIcon;
-//    static {
-//            directoryIcon=
-//            fileIcon=
-//    }
     public static Node getDirectoryIcon(){
      return    new ImageView(new Image(UIResources.class.getResourceAsStream("/ui/directory.png")));
     }

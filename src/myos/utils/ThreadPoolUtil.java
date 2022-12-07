@@ -2,8 +2,12 @@ package myos.utils;
 
 import java.util.concurrent.*;
 
+
 /**
- * Created by lindanpeng on 2017/10/20.
+ * 线程池
+ *
+ * @author WTDYang
+ * @date 2022/12/07
  */
 public class ThreadPoolUtil {
 

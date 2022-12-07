@@ -22,22 +22,22 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader fxmlLoader=new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource("/os.fxml"));
+
         fxmlLoader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root = fxmlLoader.load();
         MainController mainController= fxmlLoader.getController();
-        System.out.println(mainController);
+
         Software os= Software.getInstance();
         os.setMainController(mainController);
         mainController.setOs(os);
+
         primaryStage.setTitle("杨潇康的垃圾操作系统");
         primaryStage.setScene(new Scene(root,1100,750));
         primaryStage.setResizable(false);
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
+
+        primaryStage.setOnCloseRequest((WindowEvent event)->{
                 mainController.closeOs();
                 System.exit(0);
-            }
         });
 
         primaryStage.show();
@@ -50,8 +50,6 @@ public class Main extends Application {
      * @throws Exception 异常
      */
     public static void main(String[] args) throws Exception {
-
-               launch(args);
-
+          launch(args);
     }
 }

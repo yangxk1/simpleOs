@@ -53,7 +53,7 @@ public class Software {
     static {
         try {
             DeviceManager.initDisk();
-//            RandomAccessFile支持"随机访问"的方式，程序可以直接跳转到文件的任意地方来读写数据。
+            //RandomAccessFile支持"随机访问"的方式，程序可以直接跳转到文件的任意地方来读写数据。
             disk = new RandomAccessFile(OsConstant.DISK_FILE, "rw");
             memory = new Memory();
             cpu = new CPU();

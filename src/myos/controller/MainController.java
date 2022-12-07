@@ -38,8 +38,12 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 
+
 /**
- * Created by lindanpeng on 2017/12/29.
+ * UI总控
+ *
+ * @author WTDYang
+ * @date 2022/12/07
  */
 public class MainController implements Initializable {
     @FXML
@@ -82,10 +86,13 @@ public class MainController implements Initializable {
     private TableColumn usingDevicePIDCol;
     private Software os;
     private UpdateUIThread updateUIThread;
+    /**
+     * 位置
+     */
+    private String location;
 
     public MainController() throws Exception {
         updateUIThread = new UpdateUIThread();
-        //cmdView.setEditable(false);
     }
 
     /**
@@ -288,7 +295,8 @@ public class MainController implements Initializable {
      * 构建目录树
      */
     public void initCatalogTree() throws Exception {
-        Catalog root = os.fileOperator.readCatalog(2);
+        Catalog root = Software.fileOperator.readCatalog(2);
+
         TreeItem<Catalog> treeItem = new MyTreeItem(root);
         catalogTreeView.setRoot(treeItem);
         catalogTreeView.setCellFactory(new Callback<TreeView<Catalog>, TreeCell<Catalog>>() {
@@ -315,7 +323,6 @@ public class MainController implements Initializable {
                 };
             }
         });
-        //  catalogTreeView.setCellFactory((TreeView<Catalog> p)->new MyTreeCell());
         catalogTreeView.refresh();
     }
 
