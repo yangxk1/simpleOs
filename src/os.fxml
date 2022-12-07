@@ -20,8 +20,8 @@
                   </Label>
                   <Pane prefHeight="200.0" prefWidth="250.0">
                      <children>
-                        <Label layoutX="21.0" layoutY="16.0" text="系统时钟：" />
-                        <Text fx:id="systemTimeTxt" layoutX="94.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" />
+                        <Label layoutX="21.0" layoutY="16.0" text="运行总时间：" />
+                        <Text fx:id="systemTimeTxt" layoutX="104.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" />
                      </children>
                   </Pane>
                   <Pane prefHeight="200.0" prefWidth="200.0">
@@ -50,7 +50,7 @@
                 <RowConstraints maxHeight="700.0" minHeight="10.0" prefHeight="400.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <TitledPane animated="false" prefHeight="300.0" prefWidth="200.0" text="目录树" GridPane.rowIndex="0">
+                  <TitledPane animated="false" prefHeight="300.0" prefWidth="200.0" text="磁盘目录" GridPane.rowIndex="0">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0">
                            <children>

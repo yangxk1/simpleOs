@@ -45,6 +45,7 @@ import java.util.concurrent.BlockingQueue;
  * @author WTDYang
  * @date 2022/12/07
  */
+@SuppressWarnings("all")
 public class MainController implements Initializable {
     @FXML
     private GridPane fatView;
@@ -89,7 +90,7 @@ public class MainController implements Initializable {
     /**
      * 位置
      */
-    private String location;
+    private String location = "root";
 
     public MainController() throws Exception {
         updateUIThread = new UpdateUIThread();
@@ -217,35 +218,42 @@ public class MainController implements Initializable {
             if (cmdView.getText()==null||cmdView.getText().equals("")) {
                 return;
             }
-            String[] str = cmdView.getText().split("\\n");
+            String text =cmdView.getText();
+            int index = text.lastIndexOf(">");
+            if(index >=0){
+                text = text.substring(index+1);
+                if("".equals(text) || " ".equals(text)){
+                    return;
+                }
+            }
+            String[] str = text.split("\\n");
             String s = str[str.length - 1];
             String[] instruction = s.trim().split("\\s+");
 
-//                System.out.println(instruction[0] + " " + instruction[1]);
                 try {
-                    if (instruction[0].equals("create")) {
+                    if ("create".equals(instruction[0])) {
                         Software.fileOperator.create(instruction[1], 4);
                         cmdView.appendText("-> 创建文件成功\n");
-                    } else if (instruction[0].equals("delete")) {
+                    } else if ("delete".equals(instruction[0])) {
                         Software.fileOperator.delete(instruction[1]);
                         cmdView.appendText("-> 删除文件成功\n");
-                    } else if (instruction[0].equals("type")) {
+                    } else if ("type".equals(instruction[0])) {
                         String content = Software.fileOperator.type(instruction[1]);
                         cmdView.appendText(content + "\n");
-                    }  else if (instruction[0].equals("mkdir")) {
+                    }  else if ("mkdir".equals(instruction[0])) {
                         Software.fileOperator.mkdir(instruction[1]);
                         cmdView.appendText("-> 创建目录成功\n");
-                    } else if (instruction[0].equals("rmdir")) {
+                    } else if ("rmdir".equals(instruction[0])) {
                         Software.fileOperator.rmdir(instruction[1]);
                         cmdView.appendText("-> 删除目录成功\n");
-                    } else if (instruction[0].equals("change") && instruction.length == 3) {
+                    } else if ("change".equals(instruction[0]) && instruction.length == 3) {
                         int newProperty = Integer.valueOf(instruction[2]).intValue();
                         Software.fileOperator.changeProperty(instruction[1], newProperty);
                         cmdView.appendText("-> 修改文件属性成功\n");
-                    } else if (instruction[0].equals("run")) {
+                    } else if ("run".equals(instruction[0])) {
                         Software.fileOperator.run(instruction[1]);
                         cmdView.appendText("-> 运行文件成功\n");
-                    }else if (instruction[0].equals("open")){
+                    }else if ("open".equals(instruction[0])){
                         OpenedFile openedFile= Software.fileOperator.open(instruction[1],OpenedFile.OP_TYPE_READ_WRITE);
                         String content=new String(Software.fileOperator.read(openedFile,-1));
                         FXMLLoader fxmlLoader=new FXMLLoader();
@@ -269,22 +277,32 @@ public class MainController implements Initializable {
                         });
                         notePadStage.show();
                     }
-                    else if (instruction[0].equals("copy")){
+                    else if ("copy".equals(instruction[0])){
                         Software.fileOperator.copy(instruction[1],instruction[2]);
                         cmdView.appendText("-> 复制文件成功\n");
                     }
-                    else if (instruction[0].equals("format")){
+                    else if ("format".equals(instruction[0])){
                         Software.fileOperator.format();
                         cmdView.appendText("-> 格式化硬盘成功\n");
+                    }else if("cd".equals(instruction[0])){
+                        if("..".equals(instruction[1])){
+                            if(!"root".equals(location)){
+                                location = location.substring(0,location.lastIndexOf("/"));
+                            }
+                        }else{
+                            Software.fileOperator.existsDir(instruction[1],location);
+                            location = location+"/"+instruction[1];
+                        }
                     }
                     else {
                         cmdView.appendText("-> 指令不存在\n");
-                        return;
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     String[] exception = ex.toString().split(":");
                     cmdView.appendText("-> " + exception[exception.length - 1].trim() + "\n");
+                }finally {
+                    cmdView.appendText(location+">");
                 }
             }
 
@@ -414,9 +432,9 @@ public class MainController implements Initializable {
         for (int i = 0; i < fat.length; i++) {
             Pane pane = (Pane) fatView.getChildren().get(i);
             if (fat[i] != 0) {
-                pane.setStyle("-fx-background-color: #e34040;-fx-border-color: #EEEEBB");
+                pane.setStyle("-fx-background-color: #e34040;-fx-border-color: #ffffff");
             } else {
-                pane.setStyle("-fx-background-color:#459aec;-fx-border-color: #EEEEBB");
+                pane.setStyle("-fx-background-color:#459aec;-fx-border-color: #ffffff");
             }
         }
 
@@ -427,6 +445,13 @@ public class MainController implements Initializable {
 
     }
 
+
+    /**
+     * UI更新线程
+     *
+     * @author WTDYang
+     * @date 2022/12/07
+     */
     private class UpdateUIThread implements Runnable {
         @Override
         public void run() {

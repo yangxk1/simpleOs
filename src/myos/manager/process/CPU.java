@@ -45,7 +45,7 @@ public class CPU implements Runnable {
      * 设备状态寄存器
      */
     private int SR;
-    private String result="NOP";
+    private String result="CLK";
     private String process="";
 
     private static final int NOP = 0x0000;
@@ -108,7 +108,7 @@ public class CPU implements Runnable {
      * 执行和写回
      */
     public void execute() {
-        result ="NOP";
+        result ="CLK";  //无操作显示时钟闲逛
         process="";
         if(IR !=0)
         {
@@ -144,7 +144,7 @@ public class CPU implements Runnable {
                         break;
                     }
                     break;
-                case 3:              //! 使用设备
+                case 3:              //!??；   第一个？表示阻塞原因A,B(I/O申请），第二个？为一位数，表示阻塞时间（cpu循环次数）
                     String deviceName=null;
                     switch (DR){
                         case 0:deviceName="A";break;
@@ -162,12 +162,12 @@ public class CPU implements Runnable {
                     //重新调度
                     dispatch();
                     break;
-                case 4:result += "END";
-                        destroy();    //END
+                case 4:result += "END";//END 表示程序结束，其中包括文件路径名和x的值（软中断方式处理）
+                        destroy();
                         dispatch();
 
                     break;
-                case 5:switch (DR){ //MOV
+                case 5:switch (DR){ //MOV 给x赋值一位数
                     case 0:AX = nextIR;result +="MOV AX,"+nextIR;
                         process = "AX="+AX;
                         break;

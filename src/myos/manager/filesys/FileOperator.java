@@ -692,6 +692,15 @@ public class FileOperator {
         }
         return false;
     }
+    public boolean existsDir(String dirName,String location) throws Exception {
+        int parentCatalogBlockPos = getCatalogBlock(location, 2);//找到该文件父目录所在磁盘块
+        Catalog parentDir = readCatalog(parentCatalogBlockPos);
+        //查找该文件夹下是否有同名目录
+        if (!existsFile(dirName, parentDir.getStartBlock())) {
+            throw new Exception(String.format("not found %s in %s",dirName,location));
+        }
+        return true;
+    }
 
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
