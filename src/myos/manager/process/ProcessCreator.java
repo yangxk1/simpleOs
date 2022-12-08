@@ -24,20 +24,25 @@ public class ProcessCreator {
         this.cpu= Software.cpu;
     }
     //TODO 内存管理
-    /**
-     * 为打开的可执行文件创建进程
-     * @param program
-     */
-    public void create(byte[] program) throws Exception {
 
-        /*申请空白进程块*/
+    /**
+     * 创建
+     * 为打开的可执行文件创建进程
+     *
+     * @param program 程序
+     * @param data    数据
+     * @throws Exception 异常
+     */
+    public void create(byte[] program,byte[] data) throws Exception {
+
+//        查看是否超出运行进程的最大个数
         int pcbSize=memory.getAllPCB().size();
         if (pcbSize>=OsConstant.PROCESS_MAX) {
             throw  new Exception("当前运行的进程过多，请关闭其他程序后再试");
         }
-        /*申请内存*/
+//        申请内存
         SubArea subArea=null;
-        //首次适配法
+        //首次适配法 第一个空闲位置
         ListIterator<SubArea> it=memory.getSubAreas().listIterator();
         while(it.hasNext()){
             SubArea s=it.next();
@@ -68,28 +73,31 @@ public class ProcessCreator {
            subArea.setTaskNo(newPCB.getPID());
            subArea.setStatus(SubArea.STATUS_BUSY);
        }
-     //  System.out.println("进程首地址："+subArea.getStartAdd());
-       //将数据复制到用户区
-        byte[] userArea=memory.getUserArea();
-       for (int i=subArea.getStartAdd(),j=0;i<subArea.getStartAdd()+subArea.getSize();i++,j++){
+
+       //代码段写入内存
+       byte[] userArea=memory.getUserArea();
+       int lastAdd = subArea.getStartAdd()+subArea.getSize();
+       for (int i=subArea.getStartAdd(),j=0;i<lastAdd;i++,j++){
            userArea[i]=program[j];
        }
-       System.out.println("创建的进程ID"+newPCB.getPID());
+
+
         //初始化进程控制块
         newPCB.setMemStart(subArea.getStartAdd());
         newPCB.setMemEnd(program.length);
         newPCB.setCounter(subArea.getStartAdd());
         newPCB.setStatus(PCB.STATUS_WAIT);
-        memory.getWaitPCB().offer(newPCB);//进程就绪
+        //申请完成
+        memory.getWaitPCB().offer(newPCB);
+
+
         //判断当前是否有实际运行进程，没有的则申请进程调度
         if (memory.getRunningPCB()==null||memory.getRunningPCB()==memory.getHangOutPCB()) {
-            System.out.println("申请进程调度");
             lock.lock();
             cpu.toReady();
             cpu.dispatch();
             lock.unlock();
         }
-
 
     }
 

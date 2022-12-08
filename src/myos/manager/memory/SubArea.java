@@ -17,7 +17,7 @@ public class SubArea {
      */
     public  static final int STATUS_BUSY=1;
     /**
-     * 开始地址
+     * 段基址
      */
      private int startAdd;
     /**

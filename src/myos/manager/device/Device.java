@@ -1,5 +1,6 @@
 package myos.manager.device;
 
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -21,8 +22,22 @@ public class Device {
     //占用时间
     private int timeout;
     //设备名称
-    protected String name;
+    protected String name = "未知设备";
 
+
+
+    /**
+     * 设备队列
+     */
+    protected ArrayBlockingQueue<String> deviceQueue;
+
+    public String getDeviceNiceName() throws InterruptedException {
+        return deviceQueue.take();
+    }
+
+    public void addDevice(String niceName) {
+        this.deviceQueue.add(niceName);
+    }
     /**
      * 数
      */

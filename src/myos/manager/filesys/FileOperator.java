@@ -160,7 +160,8 @@ public class FileOperator {
         openedFile.setWritePointer(writePointer);
         openedFiles.add(openedFile);
         byte[] instructions = read(openedFile, -1);
-        processCreator.create(instructions);
+        byte[] data = new byte[0];
+        processCreator.create(instructions,data);
     }
     public void copy(String srcFilePath,String desFilePath) throws Exception {
         OpenedFile openedFile1=null,openedFile2=null;

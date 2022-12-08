@@ -1,5 +1,6 @@
 package myos.controller;
 
+import com.sun.deploy.util.StringUtils;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,9 +27,11 @@ import myos.manager.device.DeviceOccupy;
 import myos.manager.device.DeviceRequest;
 import myos.manager.filesys.Catalog;
 import myos.manager.filesys.OpenedFile;
+import myos.manager.process.CPU;
 import myos.manager.process.PCB;
 import myos.manager.memory.SubArea;
 import myos.manager.process.Clock;
+import myos.utils.ThreadPoolUtil;
 import myos.vo.DeviceVo;
 import myos.vo.MyTreeItem;
 import myos.vo.PCBVo;
@@ -37,6 +40,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -74,27 +78,23 @@ public class MainController implements Initializable {
     @FXML
     private HBox userAreaView;
     @FXML
-    private TableView<DeviceVo>  waitingDeviceQueueView;
+    private TableView<DeviceVo> waitingDeviceQueueView;
     @FXML
     private TableColumn waitingDeviceNameCol;
     @FXML
     private TableColumn waitingDevicePIDCol;
     @FXML
-    private TableView<DeviceVo>  usingDeviceQueueView;
+    private TableView<DeviceVo> usingDeviceQueueView;
     @FXML
     private TableColumn usingDeviceNameCol;
     @FXML
     private TableColumn usingDevicePIDCol;
     private Software os;
-    private UpdateUIThread updateUIThread;
+
     /**
      * 位置
      */
     private String location = "root";
-
-    public MainController() throws Exception {
-        updateUIThread = new UpdateUIThread();
-    }
 
     /**
      * 初始化组件
@@ -104,7 +104,19 @@ public class MainController implements Initializable {
     public void initComponent() throws Exception {
         processRunningView.setText("");
         processResultView.setText("");
-        cmdView.setText("");
+        ThreadPoolUtil.getInstance().execute(()->{
+            cmdView.setText("\n\n\n\n\n           LOADING MY OS  .");
+            try {
+                TimeUnit.MILLISECONDS.sleep(500);
+                cmdView.setText("\n\n\n\n\n           LOADING MY OS  . .");
+                TimeUnit.MILLISECONDS.sleep(500);
+                cmdView.setText("\n\n\n\n\n           LOADING MY OS  . . .");
+                TimeUnit.MILLISECONDS.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            cmdView.setText(location+">");
+        });
         //初始化进程队列视图
         initPcbQueueView();
         //初始化目录树
@@ -116,195 +128,161 @@ public class MainController implements Initializable {
 
     }
 
-    /*-------------------响应用户请求------------------------*/
+    public void loadDesk() throws Exception {
+                    String[][] instruction = {{"mov ax,50", "inc ax", "mov bx,111", "dec bx", "mov cx,23", "! a 2", "end"},
+                    {"mov ax,50", "mov dx,30", "! b 2", "dec bx", "inc dx", "mov ax 25", "end"},
+                    {"mov ax,50", "! c 3", "mov bx,111", "! c 1", "mov cx,23", "! a 1", "end"},
+                    {"mov ax,50", "inc ax", "! b 1", "! a 2", "mov cx,23", "inc cx", "inc ax", "! c 2", "end"},
+                    {"mov bx,70", "inc bx", "mov bx,12", "dec bx", "! c 3", "inc bx", "mov cx,23", "! a 1", "dec cx", "end"},
+                    {"mov ax,50", "! b 2", "mov bx,12", "! c 1", "mov cx,23", "! a 1", "mov ax,50", "inc ax", "mov bx,21", "dec bx", "mov cx,23", "! a 1", "end"},
+                    {"mov ax,50", "inc ax", "! b 1", "! a 2", "mov cx,23", "inc ax", "mov bx,122", "dec bx", "mov cx,32", "! a 1", "end"},
+                    {"mov ax,50", "inc ax", "! c 1", "mov cx,23", "! a 1", "mov bx,111", "dec bx", "mov cx,20", "! a 1", "end"},
+                    {"mov ax,50", "inc ax", "mov bx,13", "dec bx", "mov cx,23", "! a 1", "inc ax", "mov bx,112", "dec bx", "mov cx,23", "! a 1", "end"},
+                    {"mov ax,50", "inc ax", "mov bx,116", "inc ax", "mov bx,111", "dec bx", "mov cx,23", "! a 1", "dec bx", "mov cx,23", "! b 1", "end"}};
+            os.fileOperator.create("root/exe1",8);
+            for (int i = 0; i < instruction.length; i++) {
+                String path = "root/exe1/" + String.valueOf(i) + ".e";
+                os.fileOperator.create(path, 16);
+                OpenedFile open = os.fileOperator.open(path, OpenedFile.OP_TYPE_WRITE);
+                byte[] b = new CPU().getInstruction(instruction[i]);
+                os.fileOperator.append(path, b, b.length);
+                os.fileOperator.close(open);
+            }
+    }
     public void osSwitch() throws Exception {
         if (!Software.launched) {
             launchOS();
             cmdView.setEditable(true);
             osSwitchBtn.setStyle("-fx-background-color:#e34040");
             osSwitchBtn.setText("关机");
-//            String[][] instruction = {{"mov ax,50", "inc ax", "mov bx,111", "dec bx", "mov cx,23", "! a 2", "end"},
-//                    {"mov ax,50", "mov dx,30", "! b 2", "dec bx", "inc dx", "mov ax 25", "end"},
-//                    {"mov ax,50", "! c 3", "mov bx,111", "! c 1", "mov cx,23", "! a 1", "end"},
-//                    {"mov ax,50", "inc ax", "! b 1", "! a 2", "mov cx,23", "inc cx", "inc ax", "! c 2", "end"},
-//                    {"mov bx,70", "inc bx", "mov bx,12", "dec bx", "! c 3", "inc bx", "mov cx,23", "! a 1", "dec cx", "end"},
-//                    {"mov ax,50", "! b 2", "mov bx,12", "! c 1", "mov cx,23", "! a 1", "mov ax,50", "inc ax", "mov bx,21", "dec bx", "mov cx,23", "! a 1", "end"},
-//                    {"mov ax,50", "inc ax", "! b 1", "! a 2", "mov cx,23", "inc ax", "mov bx,122", "dec bx", "mov cx,32", "! a 1", "end"},
-//                    {"mov ax,50", "inc ax", "! c 1", "mov cx,23", "! a 1", "mov bx,111", "dec bx", "mov cx,20", "! a 1", "end"},
-//                    {"mov ax,50", "inc ax", "mov bx,13", "dec bx", "mov cx,23", "! a 1", "inc ax", "mov bx,112", "dec bx", "mov cx,23", "! a 1", "end"},
-//                    {"mov ax,50", "inc ax", "mov bx,116", "inc ax", "mov bx,111", "dec bx", "mov cx,23", "! a 1", "dec bx", "mov cx,23", "! b 1", "end"}};
-//            os.fileOperator.create("root/exe",8);
-//            for (int i = 0; i < instruction.length; i++) {
-//                String path = "root/exe/" + String.valueOf(i) + "e";
-//                os.fileOperator.create(path, 16);
-//                os.fileOperator.open(path, OpenedFile.OP_TYPE_WRITE);
-//                byte[] b = getInstruction(instruction[i]);
-//                os.fileOperator.append(path, b, b.length);
-//               // os.fileOperator.close(path);
-////
-//            }
-        }else{
-                closeOs();
-                cmdView.setEditable(false);
-                osSwitchBtn.setStyle("-fx-background-color:#0080ff");
-                osSwitchBtn.setText("开机");
-            }
+//            loadDesk();
+        } else {
+            closeOs();
+            cmdView.setEditable(false);
+            osSwitchBtn.setStyle("-fx-background-color:#0080ff");
+            osSwitchBtn.setText("开机");
         }
+    }
 
-        public byte[] getInstruction(String[] instruction)
-        {
-            ArrayList<Byte> ins=new ArrayList<>();
-            for(int i=0;i<instruction.length;i++)
-            {
-                String[] str=instruction[i].split("[\\s|,]");
-                byte first;
-                byte second =(byte)0;
-                if(str.length>1) {
-                    if (str[1].contains("a")) {
-                        second = 0;
-                    } else if (str[1].contains("b")) {
-                        second = 4;
-                    } else if (str[1].contains("c")) {
-                        second = 8;
-                    } else {
-                        second = 12;
-                    }
-                }
-                if(str[0].contains("mov")) {
-                    first = (byte)80;
-                    ins.add((byte)(first+second));
-                    ins.add(Byte.valueOf(str[2]));
-                }else if(str[0].contains("inc")){
-                    first = (byte)16;
-                    ins.add((byte)(first+second));
-                }else if(str[0].contains("dec")){
-                    first = (byte)32;
-                    ins.add((byte)(first+second));
-                }else if(str[0].contains("!")){
-                    first = (byte)48;
-                    ins.add((byte)(first+second+Byte.valueOf(str[2])));
-                }else if(str[0].contains("end")){
-                    ins.add((byte)64);
-                }
-            }
-            byte[] instruct= new byte[ins.size()];
-            for(int i=0;i<instruct.length;i++)
-            {
-                instruct[i] = ins.get(i);
-            }
-            return  instruct;
-        }
     /**
      * 启动系统
      */
     public void launchOS() throws Exception {
-            Software.launched = true;
-            os.start();
-            initComponent();
-            new Thread(updateUIThread).start();
+        Software.launched = true;
+        os.start();
+        initComponent();
+        new Thread(new UpdateUIThread()).start();
     }
-        /**
-         * 关闭系统
-         */
-    public void closeOs(){
+
+    /**
+     * 关闭系统
+     */
+    public void closeOs() {
         Software.launched = false;
         os.close();
 
     }
 
+    /**
+     * 执行cmd
+     *
+     * @param event 事件
+     * @throws Exception 异常
+     */
     public void executeCMD(KeyEvent event) throws Exception {
 
         if (event.getCode() == KeyCode.ENTER) {
-            if (cmdView.getText()==null||cmdView.getText().equals("")) {
+            if (cmdView.getText() == null || cmdView.getText().equals("")) {
                 return;
             }
-            String text =cmdView.getText();
+            String text = cmdView.getText();
             int index = text.lastIndexOf(">");
-            if(index >=0){
-                text = text.substring(index+1);
-                if("".equals(text) || " ".equals(text)){
+            if (index >= 0) {
+                text = text.substring(index + 1);
+                if ("".equals(text) || " ".equals(text)) {
                     return;
                 }
             }
             String[] str = text.split("\\n");
             String s = str[str.length - 1];
             String[] instruction = s.trim().split("\\s+");
-
-                try {
-                    if ("create".equals(instruction[0])) {
-                        Software.fileOperator.create(instruction[1], 4);
-                        cmdView.appendText("-> 创建文件成功\n");
-                    } else if ("delete".equals(instruction[0])) {
-                        Software.fileOperator.delete(instruction[1]);
-                        cmdView.appendText("-> 删除文件成功\n");
-                    } else if ("type".equals(instruction[0])) {
-                        String content = Software.fileOperator.type(instruction[1]);
-                        cmdView.appendText(content + "\n");
-                    }  else if ("mkdir".equals(instruction[0])) {
-                        Software.fileOperator.mkdir(instruction[1]);
-                        cmdView.appendText("-> 创建目录成功\n");
-                    } else if ("rmdir".equals(instruction[0])) {
-                        Software.fileOperator.rmdir(instruction[1]);
-                        cmdView.appendText("-> 删除目录成功\n");
-                    } else if ("change".equals(instruction[0]) && instruction.length == 3) {
-                        int newProperty = Integer.valueOf(instruction[2]).intValue();
-                        Software.fileOperator.changeProperty(instruction[1], newProperty);
-                        cmdView.appendText("-> 修改文件属性成功\n");
-                    } else if ("run".equals(instruction[0])) {
-                        Software.fileOperator.run(instruction[1]);
-                        cmdView.appendText("-> 运行文件成功\n");
-                    }else if ("open".equals(instruction[0])){
-                        OpenedFile openedFile= Software.fileOperator.open(instruction[1],OpenedFile.OP_TYPE_READ_WRITE);
-                        String content=new String(Software.fileOperator.read(openedFile,-1));
-                        FXMLLoader fxmlLoader=new FXMLLoader();
-                        fxmlLoader.setLocation(getClass().getResource("/notepad.fxml"));
-                        Parent parent= fxmlLoader.load();
-                        NotepadController notepadController=fxmlLoader.getController();
-                        notepadController.setOpenedFile(openedFile);
-                        notepadController.setText(content);
-                        Stage notePadStage=new Stage();
-                        notePadStage.setScene(new Scene(parent,600,400));
-                        notePadStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                            @Override
-                            public void handle(WindowEvent event) {
-                                try {
-                                    notepadController.closeFile();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-
-                                }
-                            }
-                        });
-                        notePadStage.show();
-                    }
-                    else if ("copy".equals(instruction[0])){
-                        Software.fileOperator.copy(instruction[1],instruction[2]);
-                        cmdView.appendText("-> 复制文件成功\n");
-                    }
-                    else if ("format".equals(instruction[0])){
-                        Software.fileOperator.format();
-                        cmdView.appendText("-> 格式化硬盘成功\n");
-                    }else if("cd".equals(instruction[0])){
-                        if("..".equals(instruction[1])){
-                            if(!"root".equals(location)){
-                                location = location.substring(0,location.lastIndexOf("/"));
-                            }
-                        }else{
-                            Software.fileOperator.existsDir(instruction[1],location);
-                            location = location+"/"+instruction[1];
-                        }
-                    }
-                    else {
-                        cmdView.appendText("-> 指令不存在\n");
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    String[] exception = ex.toString().split(":");
-                    cmdView.appendText("-> " + exception[exception.length - 1].trim() + "\n");
-                }finally {
-                    cmdView.appendText(location+">");
-                }
+            if (instruction.length>1 &&!"cd".equals(instruction[0]) && instruction[1].indexOf("root") == -1) {
+                instruction[1] = location + "/" + instruction[1];
             }
+            try {
+                if ("create".equals(instruction[0])) {
+                    Software.fileOperator.create(instruction[1], 4);
+                    cmdView.appendText("-> File created successfully\n");
+                } else if ("delete".equals(instruction[0])) {
+                    Software.fileOperator.delete(instruction[1]);
+                    cmdView.appendText("-> File deleted successfully\n");
+                } else if ("type".equals(instruction[0])) {
+                    String content = Software.fileOperator.type(instruction[1]);
+                    cmdView.appendText(content + "\n");
+                } else if ("mkdir".equals(instruction[0])) {
+                    Software.fileOperator.mkdir(instruction[1]);
+                    cmdView.appendText("-> Directory created successfully\n");
+                } else if ("rmdir".equals(instruction[0])) {
+                    Software.fileOperator.rmdir(instruction[1]);
+                    cmdView.appendText("-> Directory deleted successfully\n");
+                } else if ("change".equals(instruction[0]) && instruction.length == 3) {
+                    int newProperty = Integer.valueOf(instruction[2]).intValue();
+                    Software.fileOperator.changeProperty(instruction[1], newProperty);
+                    cmdView.appendText("-> Modified file attributes successfully \n");
+                } else if ("run".equals(instruction[0])) {
+                    Software.fileOperator.run(instruction[1]);
+                    cmdView.appendText("-> Run file "+instruction[1]+" successfully\n");
+                } else if ("open".equals(instruction[0])) {
+                    OpenedFile openedFile = Software.fileOperator.open(instruction[1], OpenedFile.OP_TYPE_READ_WRITE);
+                    String content = new String(Software.fileOperator.read(openedFile, -1));
+                    FXMLLoader fxmlLoader = new FXMLLoader();
+                    fxmlLoader.setLocation(getClass().getResource("/notepad.fxml"));
+                    Parent parent = fxmlLoader.load();
+                    NotepadController notepadController = fxmlLoader.getController();
+                    notepadController.setOpenedFile(openedFile);
+                    notepadController.setText(content);
+                    Stage notePadStage = new Stage();
+                    notePadStage.setScene(new Scene(parent, 600, 400));
+                    notePadStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            try {
+                                notepadController.closeFile();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+
+                            }
+                        }
+                    });
+                    notePadStage.show();
+                } else if ("copy".equals(instruction[0])) {
+                    Software.fileOperator.copy(instruction[1], instruction[2]);
+                    cmdView.appendText("-> Files copied successfully\n");
+                } else if ("format".equals(instruction[0])) {
+                    Software.fileOperator.format();
+                    cmdView.appendText("-> Format the hard disk successfully\n");
+                } else if ("cd".equals(instruction[0])) {
+                    if ("..".equals(instruction[1])) {
+                        if (!"root".equals(location)) {
+                            location = location.substring(0, location.lastIndexOf("/"));
+                        }
+                    } else {
+                        Software.fileOperator.existsDir(instruction[1], location);
+                        location = location + "/" + instruction[1];
+                    }
+                } else if("clear".equals(instruction[0])){
+                    cmdView.setText("");
+                }else {
+                    cmdView.appendText("-> "+instruction[0]+"不是内部或外部命令\n");
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                String[] exception = ex.toString().split(":");
+                cmdView.appendText("-> " + exception[exception.length - 1].trim() + "\n");
+            } finally {
+                cmdView.appendText(location + ">");
+            }
+        }
 
     }
 
@@ -352,14 +330,17 @@ public class MainController implements Initializable {
         statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
         priorityCol.setCellValueFactory(new PropertyValueFactory<>("priority"));
     }
-    public void initWaingDeviceQueueView(){
+
+    public void initWaingDeviceQueueView() {
         waitingDeviceNameCol.setCellValueFactory(new PropertyValueFactory<>("deviceName"));
         waitingDevicePIDCol.setCellValueFactory(new PropertyValueFactory<>("PID"));
     }
-    public void initUsingDeviceQueueView(){
+
+    public void initUsingDeviceQueueView() {
         usingDeviceNameCol.setCellValueFactory(new PropertyValueFactory<>("deviceName"));
         usingDevicePIDCol.setCellValueFactory(new PropertyValueFactory<>("PID"));
     }
+
     /**
      * 添加树节点
      *
@@ -461,18 +442,18 @@ public class MainController implements Initializable {
                         @Override
                         public void run() {
                             //更新等待设备进程队列视图
-                            BlockingQueue<DeviceRequest> waitForDevices= Software.cpu.getDeviceManager().getWaitForDevice();
-                            ObservableList<DeviceVo> deviceVos=FXCollections.observableArrayList();
-                            for (DeviceRequest deviceRequest:waitForDevices){
-                                DeviceVo deviceVo=new DeviceVo(deviceRequest.getDeviceName(),deviceRequest.getPcb().getPID());
+                            BlockingQueue<DeviceRequest> waitForDevices = Software.cpu.getDeviceManager().getWaitForDevice();
+                            ObservableList<DeviceVo> deviceVos = FXCollections.observableArrayList();
+                            for (DeviceRequest deviceRequest : waitForDevices) {
+                                DeviceVo deviceVo = new DeviceVo(deviceRequest.getDeviceName(), deviceRequest.getPcb().getPID());
                                 deviceVos.add(deviceVo);
                             }
                             waitingDeviceQueueView.setItems(deviceVos);
                             //更新使用设备进程队列视图
-                            Queue<DeviceOccupy> usingDevices= Software.cpu.getDeviceManager().getUsingDevices();
-                            ObservableList<DeviceVo> deviceVos2=FXCollections.observableArrayList();
-                            for (DeviceOccupy deviceOccupy:usingDevices){
-                                DeviceVo deviceVo=new DeviceVo(deviceOccupy.getDeviceName(),deviceOccupy.getObj().getPID());
+                            Queue<DeviceOccupy> usingDevices = Software.cpu.getDeviceManager().getUsingDevices();
+                            ObservableList<DeviceVo> deviceVos2 = FXCollections.observableArrayList();
+                            for (DeviceOccupy deviceOccupy : usingDevices) {
+                                DeviceVo deviceVo = new DeviceVo(deviceOccupy.getNickName(), deviceOccupy.getObj().getPID());
                                 deviceVos2.add(deviceVo);
                             }
                             usingDeviceQueueView.setItems(deviceVos2);
@@ -496,7 +477,6 @@ public class MainController implements Initializable {
                             userAreaView.getChildren().removeAll(userAreaView.getChildren());
                             List<SubArea> subAreas = Software.memory.getSubAreas();
                             for (SubArea subArea : subAreas) {
-                                System.out.println("占用分区的进程ID"+subArea.getTaskNo());
                                 Pane pane = new Pane();
                                 pane.setPrefHeight(40);
                                 pane.setPrefWidth(subArea.getSize());

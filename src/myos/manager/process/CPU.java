@@ -6,6 +6,7 @@ import myos.manager.device.DeviceRequest;
 import myos.manager.memory.Memory;
 import myos.manager.memory.SubArea;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.locks.ReentrantLock;
@@ -83,7 +84,6 @@ public class CPU implements Runnable {
             IR = userArea[IP];
             IP++;
         }
-        System.out.println("取指完成，开始运行指令"+IR);
     }
 
     /**
@@ -101,11 +101,10 @@ public class CPU implements Runnable {
             nextIR = userArea[IP];
             IP++;
         }
-        System.out.println("译码完成");
     }
 
     /**
-     * 执行和写回
+     * 执行指令
      */
     public void execute() {
         result ="CLK";  //无操作显示时钟闲逛
@@ -144,17 +143,17 @@ public class CPU implements Runnable {
                         break;
                     }
                     break;
-                case 3:              //!??；   第一个？表示阻塞原因A,B(I/O申请），第二个？为一位数，表示阻塞时间（cpu循环次数）
+                case 3:              //! ? ?； 第一个？表示阻塞原因A,B(I/O申请），第二个？为一位数，表示阻塞时间（cpu循环次数）
                     String deviceName=null;
                     switch (DR){
                         case 0:deviceName="A";break;
                         case 1:deviceName="B";break;
                         case 2:deviceName="C";break;
                     }
-                    result +="use device:"+DR+":"+deviceName+";Time:"+SR*5;
+                    result +="use device:"+DR+":"+deviceName+";Time:"+SR*10;
                     DeviceRequest deviceRequest=new DeviceRequest();
                     deviceRequest.setDeviceName(deviceName);
-                    deviceRequest.setWorkTime(SR*5000);
+                    deviceRequest.setWorkTime(SR*10000);
                     deviceRequest.setPcb(memory.getRunningPCB());
                     deviceManager.requestDevice(deviceRequest);
                     //阻塞进程
@@ -208,7 +207,7 @@ public class CPU implements Runnable {
             saveContext(pcb1);
             //恢复现场
             recoveryContext(pcb2);
-            System.out.println("要运行:"+pcb2.getPID());
+            System.out.println("NEXT PID:"+pcb2.getPID());
     }
 
     /**
@@ -287,7 +286,7 @@ public class CPU implements Runnable {
      */
     public void toReady(){
         PCB pcb=memory.getRunningPCB();
-        System.out.println("进程"+pcb.getPID()+"被放入就绪队列");
+//        System.out.println("进程"+pcb.getPID()+"被放入就绪队列");
         memory.getWaitPCB().offer(pcb);
         pcb.setStatus(PCB.STATUS_WAIT);
     }
@@ -397,5 +396,52 @@ public class CPU implements Runnable {
     public DeviceManager getDeviceManager() {
         return deviceManager;
     }
+    /**
+     * 得到指令
+     *
+     * @param instruction 指令
+     * @return {@link byte[]}
+     */
+    public byte[] getInstruction(String[] instruction) {
+        ArrayList<Byte> ins = new ArrayList<>();
+        for (int i = 0; i < instruction.length; i++) {
+            String[] str = instruction[i].split("[\\s|,]");
+            byte first;
+            byte second = (byte) 0;
+            if (str.length > 1) {
+                if (str[1].contains("a")) {
+                    second = 0;
+                } else if (str[1].contains("b")) {
+                    second = 4;
+                } else if (str[1].contains("c")) {
+                    second = 8;
+                } else {
+                    second = 12;
+                }
+            }
+            if (str[0].contains("mov")) {
+                first = (byte) 80;
+                ins.add((byte) (first + second));
+                ins.add(Byte.valueOf(str[2]));
+            } else if (str[0].contains("inc")) {
+                first = (byte) 16;
+                ins.add((byte) (first + second));
+            } else if (str[0].contains("dec")) {
+                first = (byte) 32;
+                ins.add((byte) (first + second));
+            } else if (str[0].contains("!")) {
+                first = (byte) 48;
+                ins.add((byte) (first + second + Byte.valueOf(str[2])));
+            } else if (str[0].contains("end")) {
+                ins.add((byte) 64);
+            }
+        }
+        byte[] instruct = new byte[ins.size()];
+        for (int i = 0; i < instruct.length; i++) {
+            instruct[i] = ins.get(i);
+        }
+        return instruct;
+    }
+
 }
 

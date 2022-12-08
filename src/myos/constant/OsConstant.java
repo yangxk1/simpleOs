@@ -31,6 +31,6 @@ public class OsConstant {
     /**
      * 最大进程数
      */
-    public static final int PROCESS_MAX=10;
+    public static final int PROCESS_MAX=100;
 
 }

@@ -14,6 +14,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class DeviceOccupy extends DelayItem<PCB> {
     private String deviceName;
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    private String nickName;
     public DeviceOccupy(PCB obj, long workTime, TimeUnit timeUnit) {
         super(obj, workTime, timeUnit);
     }

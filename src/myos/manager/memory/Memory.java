@@ -7,24 +7,38 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.PriorityBlockingQueue;
 
+
 /**
- * Created by lindanpeng on 2017/12/12.
- * 内存模块
+ * 内存
+ *
+ * @author WTDYang
+ * @date 2022/12/07
  */
+@SuppressWarnings("all")
 public class Memory {
-    //内存分配表
+    /**
+     * 内存分配表
+     */
     private List<SubArea> subAreas;
-/*    //空闲进程控制块
+    /*    //空闲进程控制块
     private Queue<PCB> freePCB;*/
     //就绪进程控制块
     private Queue<PCB> waitPCB;
-    //阻塞进程控制块
+    /**
+     * 阻塞进程控制块
+     */
     private Queue<PCB> blockPCB;
-    //运行进程
+    /**
+     * 运行进程
+     */
     private  PCB runningPCB;
-    //闲逛进程
+    /**
+     * 闲逛进程
+     */
     private PCB hangOutPCB;
-    //用户区内存
+    /**
+     * 用户区内存
+     */
     private byte[] userArea;
     public Memory() {
         subAreas =Collections.synchronizedList(new LinkedList<>());
