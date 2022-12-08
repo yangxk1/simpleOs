@@ -11,12 +11,18 @@ import java.util.concurrent.TimeUnit;
  * @date 2022/12/06
  */
 public class DelayItem<T> implements Delayed {
-    //时限长度
+    /**
+     * 工作时间
+     */
     private long workTime;
-    //到期时间
+    /**
+     * 到期时间
+     */
     private long expireTime;
-    //执行对象
-    protected   T obj;
+    /**
+     * 执行对象
+     */
+    protected T obj;
     public DelayItem(T obj,long workTime,TimeUnit timeUnit){
         this.obj=obj;
         this.workTime=workTime;

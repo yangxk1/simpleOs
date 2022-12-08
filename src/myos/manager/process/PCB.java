@@ -1,5 +1,7 @@
 package myos.manager.process;
 
+import java.util.Random;
+
 /**
  * Created by lindanpeng on 2017/12/24.
  */
@@ -78,7 +80,7 @@ public class PCB implements Comparable{
      * 优先级随机
      */
     public PCB(){
-        this((int) (Math.random()*10));
+        this(new Random().nextInt(64));
     }
 
 

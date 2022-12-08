@@ -13,7 +13,15 @@ import java.util.concurrent.TimeUnit;
  * @date 2022/12/06
  */
 public class DeviceOccupy extends DelayItem<PCB> {
+    /**
+     * 设备名称
+     */
     private String deviceName;
+
+    /**
+     * 设备昵称
+     */
+    private String nickName;
 
     public String getNickName() {
         return nickName;
@@ -23,7 +31,6 @@ public class DeviceOccupy extends DelayItem<PCB> {
         this.nickName = nickName;
     }
 
-    private String nickName;
     public DeviceOccupy(PCB obj, long workTime, TimeUnit timeUnit) {
         super(obj, workTime, timeUnit);
     }

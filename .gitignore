@@ -4,4 +4,4 @@
 *.class
 out
 out/*
-resources/disk.dat
+resources/*.dat

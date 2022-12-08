@@ -23,10 +23,9 @@ public class ProcessCreator {
         this.memory= Software.memory;
         this.cpu= Software.cpu;
     }
-    //TODO 内存管理
 
     /**
-     * 创建
+     * 创建进程
      * 为打开的可执行文件创建进程
      *
      * @param program 程序
@@ -40,39 +39,10 @@ public class ProcessCreator {
         if (pcbSize>=OsConstant.PROCESS_MAX) {
             throw  new Exception("当前运行的进程过多，请关闭其他程序后再试");
         }
-//        申请内存
-        SubArea subArea=null;
-        //首次适配法 第一个空闲位置
-        ListIterator<SubArea> it=memory.getSubAreas().listIterator();
-        while(it.hasNext()){
-            SubArea s=it.next();
-            if (s.getStatus()==SubArea.STATUS_FREE&&s.getSize()>=program.length) {
-                subArea = s;
-                break;
-            }
-        }
-        if (subArea==null) {
-            throw new Exception("内存不足");
-        }
-        PCB newPCB=new PCB();
 
-        //如果区域过大，分出一块新的空闲区成两块
-       if (subArea.getSize()>program.length){
-           int newSubAreaSize=subArea.getSize()-program.length;
-           subArea.setSize(program.length);
-           subArea.setTaskNo(newPCB.getPID());
-           subArea.setStatus(SubArea.STATUS_BUSY);
-           SubArea newSubArea=new SubArea();
-           //新的空闲区域
-           newSubArea.setStatus(SubArea.STATUS_FREE);
-           newSubArea.setSize(newSubAreaSize);
-           newSubArea.setStartAdd(subArea.getStartAdd()+subArea.getSize());
-           it.add(newSubArea);
-       }else {
-           subArea.setSize(program.length);
-           subArea.setTaskNo(newPCB.getPID());
-           subArea.setStatus(SubArea.STATUS_BUSY);
-       }
+        PCB newPCB=new PCB();
+        //申请内存
+        SubArea subArea = memory.requestMemory(newPCB,program,data);
 
        //代码段写入内存
        byte[] userArea=memory.getUserArea();
@@ -80,7 +50,6 @@ public class ProcessCreator {
        for (int i=subArea.getStartAdd(),j=0;i<lastAdd;i++,j++){
            userArea[i]=program[j];
        }
-
 
         //初始化进程控制块
         newPCB.setMemStart(subArea.getStartAdd());
@@ -90,7 +59,6 @@ public class ProcessCreator {
         //申请完成
         memory.getWaitPCB().offer(newPCB);
 
-
         //判断当前是否有实际运行进程，没有的则申请进程调度
         if (memory.getRunningPCB()==null||memory.getRunningPCB()==memory.getHangOutPCB()) {
             lock.lock();
@@ -98,7 +66,5 @@ public class ProcessCreator {
             cpu.dispatch();
             lock.unlock();
         }
-
     }
-
 }

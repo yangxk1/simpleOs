@@ -248,37 +248,8 @@ public class CPU implements Runnable {
     public void destroy(){
         PCB pcb=memory.getRunningPCB();
         System.out.println("进程"+pcb.getPID()+"运行结束,撤销进程");
-        /*回收进程所占内存*/
-        SubArea subArea=null;
-        List<SubArea> subAreas=memory.getSubAreas();
-        for (SubArea s:subAreas){
-            if (s.getTaskNo()==pcb.getPID()){
-                subArea=s;
-                break;
-            }
-        }
-        subArea.setStatus(SubArea.STATUS_FREE);
-        int index=subAreas.indexOf(subArea);
-        //如果不是第一个，判断上一个分区是否为空闲
-        if (index>0){
-            SubArea preSubArea=subAreas.get(index-1);
-            if(preSubArea.getStatus()==SubArea.STATUS_FREE) {
-                preSubArea.setSize(preSubArea.getSize() + subArea.getSize());
-                subAreas.remove(subArea);
-                subArea = preSubArea;
-            }
-        }
-        //如果不是最后一个，判断下一个分区是否空闲
-           if (index<subAreas.size()-1){
-            SubArea nextSubArea=subAreas.get(index+1);
-            if (nextSubArea.getStatus()==SubArea.STATUS_FREE) {
-                nextSubArea.setSize(nextSubArea.getSize() + subArea.getSize());
-                nextSubArea.setStartAdd(subArea.getStartAdd());
-                subAreas.remove(subArea);
-            }
-        }
-
-
+        //回收进程所占内存
+        memory.ReclaimMemory(pcb);
     }
 
     /**

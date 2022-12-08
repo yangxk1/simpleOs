@@ -25,10 +25,6 @@ public class OsConstant {
      */
     public static final int USER_AREA_SIZE=512;
     /**
-     * PCB数量
-     */
-    public static final int PCB_COUNT=10;
-    /**
      * 最大进程数
      */
     public static final int PROCESS_MAX=100;
