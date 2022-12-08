@@ -29,4 +29,6 @@ public class OsConstant {
      */
     public static final int PROCESS_MAX=100;
 
+    private OsConstant(){}
+
 }

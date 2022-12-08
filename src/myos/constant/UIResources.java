@@ -15,12 +15,13 @@ import java.util.Objects;
  */
 public class UIResources {
     public static Node getDirectoryIcon(){
-     return    new ImageView(new Image(Objects.requireNonNull(UIResources.class.getResourceAsStream("/ui/directory.png"))));
+     return new ImageView(new Image(Objects.requireNonNull(UIResources.class.getResourceAsStream("/ui/directory.png"))));
     }
     public static Node getFileIcon(){
-      return   new ImageView(new Image(Objects.requireNonNull(UIResources.class.getResourceAsStream("/ui/file.png"))));
+      return new ImageView(new Image(Objects.requireNonNull(UIResources.class.getResourceAsStream("/ui/file.png"))));
     }
     public static Node getProgramIcon(){
         return new ImageView(new Image(Objects.requireNonNull(UIResources.class.getResourceAsStream("/ui/program.png"))));
     }
+    private UIResources(){}
 }

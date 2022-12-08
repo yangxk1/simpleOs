@@ -4,4 +4,3 @@
 *.class
 out
 out/*
-resources/*.dat

@@ -368,7 +368,7 @@ public class CPU implements Runnable {
         return deviceManager;
     }
     /**
-     * 得到指令
+     * 编译
      *
      * @param instruction 指令
      * @return {@link byte[]}

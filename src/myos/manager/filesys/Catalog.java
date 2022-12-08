@@ -83,8 +83,9 @@ public class Catalog {
     public void setName(String name) throws Exception {
         this.name = name;
         byte[] nameBytes=name.getBytes();
-        if (nameBytes.length>5)
+        if (nameBytes.length>5) {
             throw new Exception("文件名过长！");
+        }
        for (int i=0;i<nameBytes.length;i++){
            bytes[i]=nameBytes[i];
        }
@@ -103,10 +104,20 @@ public class Catalog {
 //        bytes[4]=typeBytes[1];
 //    }
 
+    /**
+     * 获取属性
+     *
+     * @return int
+     */
     public int getProperty() {
         return property;
     }
 
+    /**
+     * 设置属性
+     *
+     * @param property 财产
+     */
     public void setProperty(int property) {
         this.property = property;
         bytes[5]=(byte)property;
@@ -184,8 +195,12 @@ public class Catalog {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Catalog catalog = (Catalog) o;
 
