@@ -1,7 +1,11 @@
 package myos.manager.filesys;
 
+
 /**
- * Created by lindanpeng on 2017/12/19.
+ * 文件路径
+ *
+ * @author WTDYang
+ * @date 2022/12/08
  */
 public class SplitFilePath {
     private String path;

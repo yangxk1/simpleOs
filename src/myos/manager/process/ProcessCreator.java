@@ -42,7 +42,7 @@ public class ProcessCreator {
 
         PCB newPCB=new PCB();
         //申请内存
-        SubArea subArea = memory.requestMemory(newPCB,program,data);
+        SubArea subArea = memory.requestMemory(newPCB,program.length);
 
        //代码段写入内存
        byte[] userArea=memory.getUserArea();

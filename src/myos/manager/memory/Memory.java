@@ -123,7 +123,7 @@ public class Memory {
      * @return {@link SubArea}
      * @throws Exception 异常
      */
-    public SubArea requestMemory(PCB newPCB, byte[] program, byte[] data) throws Exception {
+    public SubArea requestMemory(PCB newPCB, int length) throws Exception {
         SubArea subArea = null;
 
         //遍历内存分配表
@@ -131,7 +131,7 @@ public class Memory {
         while(it.hasNext()){
             SubArea s = it.next();
             if (s.getStatus() == SubArea.STATUS_FREE
-                    && s.getSize() >= program.length) {
+                    && s.getSize() >= length) {
                 subArea = s;
                 break;
             }
@@ -140,21 +140,21 @@ public class Memory {
             throw new Exception("内存不足");
         }
         //如果区域过大，分出一块新的空闲区成两块
-        if (subArea.getSize() > program.length){
+        if (subArea.getSize() > length){
             //新的空闲区域
             SubArea newSubArea=new SubArea();
             //FREE
             newSubArea.setStatus(SubArea.STATUS_FREE);
             //内存块多出来的数量
-            int newSubAreaSize=subArea.getSize()-program.length;
+            int newSubAreaSize=subArea.getSize()-length;
             newSubArea.setSize(newSubAreaSize);
             //新内存块的起始地址为原来的起始地址+本次程序占用的大小
-            newSubArea.setStartAdd(subArea.getStartAdd()+program.length);
+            newSubArea.setStartAdd(subArea.getStartAdd()+length);
             it.add(newSubArea);
         }
 
         //将占用内存置为忙碌
-        subArea.setSize(program.length);
+        subArea.setSize(length);
         subArea.setTaskNo(newPCB.getPID());
         subArea.setStatus(SubArea.STATUS_BUSY);
         return subArea;
