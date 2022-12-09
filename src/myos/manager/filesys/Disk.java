@@ -382,7 +382,7 @@ public class Disk {
         Pointer p = openedFile.getReadPointer();
         byte temp;
         while (p.getBlockNo() != -1 && readByte != length) {
-            //读完一个磁盘块
+            //读完了一个磁盘块
             if (p.getAddress() == OsConstant.DISK_BLOCK_SIZE) {
                 p.setBlockNo(getNextBlock(p.getBlockNo()));
                 p.setAddress(0);
@@ -416,7 +416,9 @@ public class Disk {
         //不断向后读取
         while (nextBlock != -1) {
             Catalog c = readCatalog(nextBlock);
-            catalogs.add(c);
+            if (!"".equals(c.getName())) {
+                catalogs.add(c);
+            }
             nextBlock = getNextBlock(nextBlock);
         }
         return catalogs;

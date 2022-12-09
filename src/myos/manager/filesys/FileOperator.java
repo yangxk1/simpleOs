@@ -206,20 +206,16 @@ public class FileOperator {
     private void append(OpenedFile openedFile, byte[] buffer, int length) throws Exception {
         //追加写入
         Pointer p = openedFile.getWritePointer();
-        //给空文件分配空间
+        //空文件
         if (openedFile.getCatalog().getStartBlock() == -1) {
-            int block = disk.firstFreeBlock();
-            setNextBlock(block, -1);
-            openedFile.getCatalog().setStartBlock(block);
-            openedFile.getCatalog().setFileLength(1);
-            writeCatalog(openedFile.getCatalog());
-            disk.seek(block * OsConstant.DISK_BLOCK_SIZE);
-            disk.write('#');
+            write(openedFile,buffer,length);
+            return;
         }
         p.setBlockNo(disk.getLastBlock(openedFile.getCatalog().getStartBlock()));
         disk.seek(p.getBlockNo() * OsConstant.DISK_BLOCK_SIZE);
         byte b;
         int i = 0;
+        //寻找最后一位
         while ((b = disk.readByte()) != '#') {
             i++;
         }
@@ -447,7 +443,6 @@ public class FileOperator {
                 }
                 int last = disk.getLastBlock(catalog.getStartBlock());
                 //修改文件分配表
-                setNextBlock(last, blockNo);
                 setNextBlock(blockNo, -1);
                 //修改写指针位置
                 pointer.setBlockNo(blockNo);
