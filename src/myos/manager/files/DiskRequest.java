@@ -19,6 +19,11 @@ public class DiskRequest {
     ArrayBlockingQueue<Request> requests;
     List<Request> runningRequests;
 
+    /**
+     * 初始化
+     * 开启电梯线程
+     * @throws InterruptedException 中断异常
+     */
     public void init() throws InterruptedException {
         requests = new ArrayBlockingQueue<>(16);
         runningRequests = new Vector<>();
@@ -60,6 +65,11 @@ public class DiskRequest {
         request.method.ioMethod();
     }
 
+    /**
+     * 启动电梯调度算法
+     *
+     * @return {@link Runnable}
+     */
     public Runnable SCAN(){
         return new Runnable() {
             @Override
