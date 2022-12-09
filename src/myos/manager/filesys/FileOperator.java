@@ -186,10 +186,14 @@ public class FileOperator {
      * @param buffer   要写入的缓冲区数据
      * @param length   数据的长度
      */
-    public void write(String filePath, String data) throws Exception {
+    public void write(String filePath, String data,int type) throws Exception {
         OpenedFile openedFile = open(filePath,OpenedFile.OP_TYPE_WRITE);
         byte[] buffer = data.getBytes();
-        write(openedFile, buffer, buffer.length);
+        if (type == 1) {
+            write(openedFile, buffer, buffer.length);
+        }else {
+            append(openedFile,buffer,buffer.length);
+        }
     }
 
     /**
@@ -199,9 +203,7 @@ public class FileOperator {
      * @param buffer
      * @param length
      */
-    public void append(String filePath, byte[] buffer, int length) throws Exception {
-        //查看是否可以写入
-        OpenedFile openedFile = getOpenedFile(filePath);
+    private void append(OpenedFile openedFile, byte[] buffer, int length) throws Exception {
         //追加写入
         Pointer p = openedFile.getWritePointer();
         //给空文件分配空间
@@ -423,12 +425,11 @@ public class FileOperator {
      */
     public void write(OpenedFile openedFile, byte[] buffer, int length) throws Exception {
         if (openedFile.getOpType() != OpenedFile.OP_TYPE_WRITE&&openedFile.getOpType()!=OpenedFile.OP_TYPE_READ_WRITE) {
-            throw new Exception("文件不处于写模式,不能写入");
+            throw new Exception("文件只读，不可写入");
         }
         Pointer pointer = openedFile.getWritePointer();
         Catalog catalog = openedFile.getCatalog();
         pointer.setBlockNo(catalog.getStartBlock());
-        pointer.setAddress(0);
         int writtenBytes = 0;
         while (writtenBytes != length) {
             if (pointer.getAddress() == OsConstant.DISK_BLOCK_SIZE) {

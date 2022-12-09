@@ -145,7 +145,7 @@ public class MainController implements Initializable {
                 os.fileOperator.create(path, 16);
                 OpenedFile open = os.fileOperator.open(path, OpenedFile.OP_TYPE_WRITE);
                 byte[] b = new CPU().getInstruction(instruction[i]);
-                os.fileOperator.append(path, b, b.length);
+                os.fileOperator.write(path,new String(b),0);
                 os.fileOperator.close(open);
             }
     }
@@ -247,7 +247,12 @@ public class MainController implements Initializable {
                     cmdView.appendText(content);
                     cmdView.appendText("\n------------------------------------------\n");
                 } else if ("write".equals(instruction[0])){
-                    Software.fileOperator.write(instruction[1],instruction[2]);
+                    if (instruction.length>=4 &&"-a".equals(instruction[2])){
+                        //追加写入
+                        Software.fileOperator.write(instruction[1],instruction[3],0);
+                    }else {
+                        Software.fileOperator.write(instruction[1],instruction[2],1);
+                    }
                 } else if ("copy".equals(instruction[0])) {
                     Software.fileOperator.copy(instruction[1], instruction[2]);
                     cmdView.appendText("-> Files copied successfully\n");
