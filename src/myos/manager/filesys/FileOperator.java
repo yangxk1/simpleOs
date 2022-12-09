@@ -327,15 +327,9 @@ public class FileOperator {
      * @param dirPath
      */
     public List<String> dir(String dirPath) throws Exception {
-        int catalogBlock = disk.getCatalogBlock(dirPath, 2);
-        List<Catalog> catalogs = new ArrayList<>();
-        Catalog catalog = disk.readCatalog(catalogBlock);
-        int nextBlock = catalog.getStartBlock();
-        while (nextBlock != -1) {
-            Catalog c = disk.readCatalog(nextBlock);
-            catalogs.add(c);
-            nextBlock = disk.getNextBlock(nextBlock);
-        }
+        //读取到文件列表
+        List<Catalog> catalogs = disk.dir(dirPath);
+        //收集位字符串数组传给视图层显示
         List<String> names = catalogs.stream().map(e -> {
             String s = String.format("%10s  -  type:%5s\n", e.getName(),
                     e.isDirectory()?"dir":(e.isExecutable()?"exe":"file"));

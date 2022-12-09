@@ -5,6 +5,7 @@ import myos.constant.OsConstant;
 import myos.controller.MainController;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -402,4 +403,24 @@ public class Disk {
         return content;
     }
 
+    /**
+     * 获取文件目录物理层实现
+     *
+     * @return {@link List}<{@link Catalog}>
+     */
+    public List<Catalog> dir(String dirPath) throws Exception {
+        //寻找文件所在盘号
+        int catalogBlock = getCatalogBlock(dirPath, 2);
+        List<Catalog> catalogs = new ArrayList<>();
+        //读取本块号
+        Catalog catalog = readCatalog(catalogBlock);
+        int nextBlock = catalog.getStartBlock();
+        //不断向后读取
+        while (nextBlock != -1) {
+            Catalog c = readCatalog(nextBlock);
+            catalogs.add(c);
+            nextBlock = getNextBlock(nextBlock);
+        }
+        return catalogs;
+    }
 }
