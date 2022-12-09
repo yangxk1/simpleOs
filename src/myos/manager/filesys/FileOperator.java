@@ -10,6 +10,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -320,23 +321,35 @@ public class FileOperator {
         create(dirPath, 8);
     }
 
-//    /**
-//     * 显示目录的内容
-//     *
-//     * @param dirPath
-//     */
-//    public List<Catalog> dir(String dirPath) throws Exception {
-//        int catalogBlock = getCatalogBlock(dirPath, 2);
-//        List<Catalog> catalogs = new ArrayList<>();
-//        Catalog catalog = readCatalog(catalogBlock);
-//        int nextBlock = catalog.getStartBlock();
-//        while (nextBlock != -1) {
-//            Catalog c = readCatalog(nextBlock);
-//            catalogs.add(c);
-//            nextBlock = getNextBlock(nextBlock);
-//        }
-//        return catalogs;
-//    }
+    /**
+     * 显示目录的内容
+     *
+     * @param dirPath
+     */
+    public List<String> dir(String dirPath) throws Exception {
+        int catalogBlock = disk.getCatalogBlock(dirPath, 2);
+        List<Catalog> catalogs = new ArrayList<>();
+        Catalog catalog = disk.readCatalog(catalogBlock);
+        int nextBlock = catalog.getStartBlock();
+        while (nextBlock != -1) {
+            Catalog c = disk.readCatalog(nextBlock);
+            catalogs.add(c);
+            nextBlock = disk.getNextBlock(nextBlock);
+        }
+        List<String> names = catalogs.stream().map(e -> {
+            String s = String.format("%10s  -  type:%5s\n", e.getName(),
+                    e.isDirectory()?"dir":(e.isExecutable()?"exe":"file"));
+            return s;
+        }).collect(Collectors.toList());
+        return names;
+    }
+
+    public static void main(String[] args) throws Exception {
+        List<String> catalogs = new FileOperator().dir("root/exe");
+        catalogs.forEach((item)->{
+            System.out.println(item);
+        });
+    }
 
     /**
      * 删除文件夹
@@ -427,6 +440,14 @@ public class FileOperator {
         disk.write('#');
     }
 
+    /**
+     * 追加文件信息
+     *
+     * @param openedFile 打开文件
+     * @param butter     缓存区
+     * @param length     长度
+     * @throws Exception 异常
+     */
     private void append(OpenedFile openedFile, byte[] butter, int length) throws Exception {
         Pointer p = openedFile.getWritePointer();
         //给空文件分配空间
@@ -460,6 +481,7 @@ public class FileOperator {
      * @throws IOException
      */
     private void setNextBlock(int i, int nextBlock) throws IOException {
+        //将第i位设置位nextBlock
         disk.setNextBlock(i,nextBlock);
         //更新分区表视图
         mainController.updateFatView();
@@ -467,7 +489,7 @@ public class FileOperator {
 
 
     /**
-     * 获取文件对应的打开文件项
+     * 获取文件对应的打开文件信息
      *
      * @param filePath
      * @return
@@ -494,7 +516,9 @@ public class FileOperator {
      * @throws IOException
      */
     private void writeCatalog(Catalog catalog) throws IOException {
+        //物理层写入
         disk.writeCatalog(catalog);
+        //视图层更新
         mainController.updateTreeItem(catalog);
     }
 

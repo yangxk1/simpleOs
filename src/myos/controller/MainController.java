@@ -210,7 +210,12 @@ public class MainController implements Initializable {
                 instruction[1] = location + "/" + instruction[1];
             }
             try {
-                if ("create".equals(instruction[0])) {
+                if  ("ls".equals(instruction[0])) {
+                    List<String> dirs = Software.fileOperator.dir(location);
+                    dirs.forEach(e->{
+                        cmdView.appendText(e);
+                    });
+                } else if ("create".equals(instruction[0])) {
                     Software.fileOperator.create(instruction[1], 4);
                     cmdView.appendText("-> File created successfully\n");
                 } else if ("delete".equals(instruction[0])) {
