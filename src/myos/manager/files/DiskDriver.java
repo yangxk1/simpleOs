@@ -1,98 +1,48 @@
 package myos.manager.files;
 
 import myos.constant.OsConstant;
+import myos.utils.ThreadPoolUtil;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import static java.lang.System.exit;
 import static myos.constant.OsConstant.DISK_BLOCK_QUNTITY;
 import static myos.constant.OsConstant.DISK_BLOCK_SIZE;
 
 /**
- * 磁盘
+ * 磁盘驱动
  *
  * @author WTDYang
  * @date 2022/12/08
  */
 @SuppressWarnings("all")
-public class Disk {
+public class DiskDriver {
 
     /**
-     * 磁盘文件
+     * 物理磁盘文件
      */
-    RandomAccessFile disk;
-    public Disk(RandomAccessFile disk){
+    private RandomAccessFile disk;
+
+    private DiskRequest diskRequest;
+
+
+    public DiskDriver(RandomAccessFile disk){
         this.disk = disk;
+        this.diskRequest = new DiskRequest();
+        try {
+            diskRequest.init();
+        }catch (Exception e){
+            System.out.println("磁盘申请驱动失败");
+        }
     }
 
     /**
-     * 随机寻址
-     *
-     * @param pos pos
-     * @throws IOException ioexception
+     * 初始化
      */
-    public void seek(long pos) throws IOException {
-        disk.seek(pos);
-    }
-
-    /**
-     * 写字节
-     *
-     * @param v v
-     * @throws IOException ioexception
-     */
-    public final void writeByte(int v )throws java.io.IOException{
-        disk.writeByte(v);
-    }
-
-    /**
-     * 写入数据
-     *
-     * @param b   the data
-     * @param off the start offset in the data
-     * @param len the number of bytes to write
-     * @throws IOException if an I/O error occurs
-     */
-    public void write(byte[] b, int off, int len ) throws java.io.IOException {
-        disk.write(b,off,len);
-    }
-    public void write(int b )throws java.io.IOException{
-        disk.write(b);
-    }
-    /**
-     * 读取字节
-     *
-     * @return byte 读取到的字节
-     * @throws IOException ioexception
-     */
-    public final byte readByte()throws java.io.IOException{
-        return disk.readByte();
-    }
-
-    /**
-     * 读
-     *
-     * @param b   the buffer into which the data is read
-     * @param off the start offset in array b at which the data is written
-     * @param len the maximum number of bytes read
-     * @return int the total number of bytes read into the buffer, or -1 if there is no more data because the end of the file has been reached.
-     * @throws IOException ioexception
-     */
-    public int read(byte[] b,int off,int len )throws java.io.IOException  {
-        return disk.read(b,off,len);
-    }
-
-    public RandomAccessFile getDisk() {
-        return disk;
-    }
-
-    public void setDisk(RandomAccessFile disk) {
-        this.disk = disk;
-    }
-
     public static void init() {
         File file = new File(OsConstant.DISK_FILE);
         //+---------------------------------------------------+
@@ -155,6 +105,76 @@ public class Disk {
                 }
             }
         }
+    }
+    /**
+     * 随机寻址
+     *
+     * @param pos pos
+     * @throws IOException ioexception
+     */
+    public void seek(long pos) throws IOException, InterruptedException {
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        Request request = new Request((int) pos,()->{
+            disk.seek(pos);
+            countDownLatch.countDown();
+        });
+        diskRequest.waitForElevator(request);
+        countDownLatch.await();
+    }
+
+    /**
+     * 写字节
+     *
+     * @param v v
+     * @throws IOException ioexception
+     */
+    public final void writeByte(int v )throws java.io.IOException{
+        disk.writeByte(v);
+    }
+
+    /**
+     * 写入数据
+     *
+     * @param b   the data
+     * @param off the start offset in the data
+     * @param len the number of bytes to write
+     * @throws IOException if an I/O error occurs
+     */
+    public void write(byte[] b, int off, int len ) throws java.io.IOException {
+        disk.write(b,off,len);
+    }
+    public void write(int b )throws java.io.IOException{
+        disk.write(b);
+    }
+    /**
+     * 读取字节
+     *
+     * @return byte 读取到的字节
+     * @throws IOException ioexception
+     */
+    public final byte readByte()throws java.io.IOException{
+        return disk.readByte();
+    }
+
+    /**
+     * 读
+     *
+     * @param b   the buffer into which the data is read
+     * @param off the start offset in array b at which the data is written
+     * @param len the maximum number of bytes read
+     * @return int the total number of bytes read into the buffer, or -1 if there is no more data because the end of the file has been reached.
+     * @throws IOException ioexception
+     */
+    public int read(byte[] b,int off,int len )throws java.io.IOException  {
+        return disk.read(b,off,len);
+    }
+
+    public RandomAccessFile getDisk() {
+        return disk;
+    }
+
+    public void setDisk(RandomAccessFile disk) {
+        this.disk = disk;
     }
 
     /**

@@ -2,6 +2,12 @@ package myos.manager.device;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
+/**
+ * c设备
+ *
+ * @author WTDYang
+ * @date 2022/12/09
+ */
 public class C extends Device {
     public C(int count) {
         super(count);

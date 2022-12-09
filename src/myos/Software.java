@@ -2,7 +2,7 @@ package myos;
 
 import myos.constant.OsConstant;
 import myos.controller.MainController;
-import myos.manager.files.Disk;
+import myos.manager.files.DiskDriver;
 import myos.manager.files.FileOperator;
 import myos.manager.memory.Memory;
 import myos.manager.process.CPU;
@@ -50,7 +50,7 @@ public class Software {
     static {
         try {
 //            DeviceManager.initDisk();
-            Disk.init();
+            DiskDriver.init();
             //RandomAccessFile支持"随机访问"的方式，程序可以直接跳转到文件的任意地方来读写数据。
             disk = new RandomAccessFile(OsConstant.DISK_FILE, "rw");
             memory = new Memory();

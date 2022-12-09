@@ -27,7 +27,7 @@ public class FileOperator {
     /**
      * 磁盘文件
      */
-    public Disk disk;
+    public DiskDriver disk;
     /**
      * 进程操作
      */
@@ -45,7 +45,7 @@ public class FileOperator {
      * 初始化
      */
     public void init() {
-        this.disk = new Disk( Software.disk);
+        this.disk = new DiskDriver( Software.disk);
         this.processCreator = Software.processCreator;
         this.openedFiles = new ArrayList<>();
     }

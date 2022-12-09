@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author WTDYang
  * @date 2022/12/06
  */
-public class Device {
+public abstract class Device {
     /**
      * 空闲位
      */
@@ -17,14 +17,18 @@ public class Device {
      * 占用位
      */
     public static final int STATUS_BUSY=1;
-    //设备状态
+    /**
+     * 设备状态
+     */
     private int status;
-    //占用时间
+    /**
+     * 占用时间
+     */
     private int timeout;
-    //设备名称
+    /**
+     * 设备名称
+     */
     protected String name = "未知设备";
-
-
 
     /**
      * 设备队列
