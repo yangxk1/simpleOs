@@ -11,35 +11,40 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+
 /**
- * 文件操作类
- * Created by lindanpeng on 2017/12/6.
+ * 文件操作
+ *
+ * @author WTDYang
+ * @date 2022/12/09
  */
+@SuppressWarnings("all")
 public class FileOperator {
 
-    //已打开文件项
+    /**
+     * 打开文件
+     */
     List<OpenedFile> openedFiles;
-    //磁盘文件
-    RandomAccessFile disk;
-    //进程操作
+    /**
+     * 磁盘文件
+     */
+    public Disk disk;
+    /**
+     * 进程操作
+     */
     ProcessCreator processCreator;
-    //界面控制
+    /**
+     * 主控制器界面
+     */
     private MainController mainController;
 
-    public FileOperator() throws Exception {
+    public FileOperator(){
+        init();
+    }
+    public void init() {
+        this.disk = new Disk( Software.disk);
         this.processCreator = Software.processCreator;
-        this.disk = Software.disk;
         this.openedFiles = new ArrayList<>();
-
-    }
-    public void init() throws Exception {
-
-    }
-    public byte[] getFat() throws IOException {
-        disk.seek(0);
-        byte[] buffer = new byte[OsConstant.DISK_BLOCK_QUNTITY];
-        disk.read(buffer, 0, buffer.length);
-        return buffer;
     }
 
     /**
@@ -419,7 +424,7 @@ public class FileOperator {
                 p.setAddress(0);
             }
             disk.seek(p.getBlockNo() * OsConstant.DISK_BLOCK_SIZE + p.getAddress());
-            temp = disk.readByte();
+            temp =disk.readByte();
             //遇到结束符停止读取
             if (temp == '#') {
                 break;
@@ -693,6 +698,15 @@ public class FileOperator {
         }
         return false;
     }
+
+    /**
+     * 判断是否存在文件夹
+     *
+     * @param dirName  文件夹名字
+     * @param location 位置
+     * @return boolean
+     * @throws Exception 异常
+     */
     public boolean existsDir(String dirName,String location) throws Exception {
         int parentCatalogBlockPos = getCatalogBlock(location, 2);//找到该文件父目录所在磁盘块
         Catalog parentDir = readCatalog(parentCatalogBlockPos);
@@ -700,6 +714,7 @@ public class FileOperator {
         if (!existsFile(dirName, parentDir.getStartBlock())) {
             throw new Exception(String.format("not found %s in %s",dirName,location));
         }
+        //TODO 判断是不是一个目录
         return true;
     }
 

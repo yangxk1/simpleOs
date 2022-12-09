@@ -409,7 +409,7 @@ public class MainController implements Initializable {
      * 更新磁盘使用情况
      */
     public void updateFatView() throws IOException {
-        byte[] fat = Software.fileOperator.getFat();
+        byte[] fat = Software.fileOperator.disk.getBitMaps();
         for (int i = 0; i < fat.length; i++) {
             Pane pane = (Pane) fatView.getChildren().get(i);
             if (fat[i] != 0) {

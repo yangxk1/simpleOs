@@ -1,23 +1,48 @@
 package myos.manager.filesys;
 
+
 /**
- * Created by lindanpeng on 2017/12/6.
- *已打开文件
+ * 打开状态文件
+ *
+ * @author WTDYang
+ * @date 2022/12/08
  */
 public class OpenedFile {
-    public static final int OP_TYPE_READ=0;//读方式打开文件
-    public static final int OP_TYPE_WRITE=1;//写方式打开文件
-    public static final int OP_TYPE_READ_WRITE=2;//读写模式
-    public static final int OP_TYPE_RUN=3;//执行模式
-    //文件路径名
+    /**
+     * 只读方式打开文件
+     */
+    public static final int OP_TYPE_READ=0;
+    /**
+     * 写入方式打开文件
+     */
+    public static final int OP_TYPE_WRITE=1;
+    /**
+     * 读写方式打开文件
+     */
+    public static final int OP_TYPE_READ_WRITE=2;
+    /**
+     * 执行状态打开
+     */
+    public static final int OP_TYPE_RUN=3;
+    /**
+     * 文件路径名
+     */
     private String filePath;
-    //文件目录项
+    /**
+     * 文件目录项
+     */
     private Catalog catalog;
-    //操作类型
+    /**
+     * 操作类型
+     */
     private int opType;
-    //读指针
+    /**
+     * 读指针
+     */
     private Pointer readPointer;
-    //写指针
+    /**
+     * 写指针
+     */
     private Pointer writePointer;
 
 
@@ -64,9 +89,13 @@ public class OpenedFile {
     }
 }
 class Pointer{
-    //块号
+    /**
+     * 块号
+     */
     private int blockNo;
-    //块内地址
+    /**
+     * 块内地址
+     */
     private int address;
 
     public int getBlockNo() {
