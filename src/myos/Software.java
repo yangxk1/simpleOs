@@ -2,9 +2,8 @@ package myos;
 
 import myos.constant.OsConstant;
 import myos.controller.MainController;
-import myos.manager.device.DeviceManager;
-import myos.manager.filesys.Disk;
-import myos.manager.filesys.FileOperator;
+import myos.manager.files.Disk;
+import myos.manager.files.FileOperator;
 import myos.manager.memory.Memory;
 import myos.manager.process.CPU;
 import myos.manager.process.Clock;
@@ -12,9 +11,6 @@ import myos.manager.process.ProcessCreator;
 import myos.utils.ThreadPoolUtil;
 
 import java.io.*;
-
-import static myos.constant.OsConstant.DISK_BLOCK_QUNTITY;
-import static myos.constant.OsConstant.DISK_BLOCK_SIZE;
 
 @SuppressWarnings("all")
 public class Software {

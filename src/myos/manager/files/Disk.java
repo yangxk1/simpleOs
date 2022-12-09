@@ -1,8 +1,6 @@
-package myos.manager.filesys;
+package myos.manager.files;
 
-import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
 import myos.constant.OsConstant;
-import myos.controller.MainController;
 
 import java.io.*;
 import java.util.ArrayList;

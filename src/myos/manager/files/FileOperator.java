@@ -1,4 +1,4 @@
-package myos.manager.filesys;
+package myos.manager.files;
 
 import myos.Software;
 import myos.constant.OsConstant;

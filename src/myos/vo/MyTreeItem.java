@@ -2,7 +2,7 @@ package myos.vo;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
-import myos.manager.filesys.Catalog;
+import myos.manager.files.Catalog;
 
 import java.io.IOException;
 
