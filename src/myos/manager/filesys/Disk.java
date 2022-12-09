@@ -87,8 +87,6 @@ public class Disk {
         return disk.read(b,off,len);
     }
 
-
-
     public RandomAccessFile getDisk() {
         return disk;
     }

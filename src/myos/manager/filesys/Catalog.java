@@ -58,7 +58,6 @@ public class Catalog {
      */
     private boolean isBlank;
 
-
     /**
      * 目录
      *     //+---------------------------------+
@@ -66,6 +65,7 @@ public class Catalog {
      *     //+---------------------------------+
      *     //|   5   |  1  |    1    |    1    |
      *     //+---------------------------------+
+     *     子文件间起始盘号均指向下一个文件，形成一个链表
      * @param bytes 硬件读取到的字节流
      */
     public Catalog(byte[] bytes){
@@ -163,11 +163,13 @@ public class Catalog {
     public void setProperty(int property) {
         this.property = property;
         bytes[5]=(byte)property;
+        //16为可执行文件
         if (property>>4==1){
             executable=true;
         }else{
             executable=false;
         }
+        //8为文件夹
          if (property>>3==1){
             isDirectory=true;
         }else {

@@ -204,6 +204,10 @@ public class MainController implements Initializable {
                 }
             }
             String[] str = text.split("\\n");
+            if(str.length <= 0){
+                cmdView.appendText(location + ">");
+                return;
+            }
             String s = str[str.length - 1];
             String[] instruction = s.trim().split("\\s+");
             if (instruction.length>1 &&!"cd".equals(instruction[0]) && instruction[1].indexOf("root") == -1) {
@@ -237,29 +241,13 @@ public class MainController implements Initializable {
                 } else if ("run".equals(instruction[0])) {
                     Software.fileOperator.run(instruction[1]);
                     cmdView.appendText("-> Run file "+instruction[1]+" successfully\n");
-                } else if ("open".equals(instruction[0])) {
-                    OpenedFile openedFile = Software.fileOperator.open(instruction[1], OpenedFile.OP_TYPE_READ_WRITE);
-                    String content = new String(Software.fileOperator.read(openedFile, -1));
-                    FXMLLoader fxmlLoader = new FXMLLoader();
-                    fxmlLoader.setLocation(getClass().getResource("/notepad.fxml"));
-                    Parent parent = fxmlLoader.load();
-                    NotepadController notepadController = fxmlLoader.getController();
-                    notepadController.setOpenedFile(openedFile);
-                    notepadController.setText(content);
-                    Stage notePadStage = new Stage();
-                    notePadStage.setScene(new Scene(parent, 600, 400));
-                    notePadStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                        @Override
-                        public void handle(WindowEvent event) {
-                            try {
-                                notepadController.closeFile();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-
-                            }
-                        }
-                    });
-                    notePadStage.show();
+                } else if ("read".equals(instruction[0])) {
+                    String content = new String(Software.fileOperator.read(instruction[1], -1));
+                    cmdView.appendText("------------------------------------------\n");
+                    cmdView.appendText(content);
+                    cmdView.appendText("\n------------------------------------------\n");
+                } else if ("write".equals(instruction[0])){
+                    Software.fileOperator.write(instruction[1],instruction[2]);
                 } else if ("copy".equals(instruction[0])) {
                     Software.fileOperator.copy(instruction[1], instruction[2]);
                     cmdView.appendText("-> Files copied successfully\n");
