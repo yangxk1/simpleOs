@@ -26,4 +26,21 @@ public class SplitFilePath {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
+    /**
+     * 将文件路径与文件名分割开来
+     *
+     * @param filePath
+     * @return
+     */
+    public static SplitFilePath splitPathAndFileName(String filePath) {
+        int fileNameStartIndex = filePath.lastIndexOf('/');
+        //单独的文件名
+        String fileName = filePath.substring(fileNameStartIndex + 1);
+        //提取路径
+        String path = filePath.substring(0, fileNameStartIndex);
+        SplitFilePath splitFilePath = new SplitFilePath();
+        splitFilePath.setFileName(fileName);
+        splitFilePath.setPath(path);
+        return splitFilePath;
+    }
 }

@@ -259,7 +259,7 @@ public class MainController implements Initializable {
                     Software.fileOperator.copy(instruction[1], instruction[2]);
                     cmdView.appendText("-> Files copied successfully\n");
                 } else if ("format".equals(instruction[0])) {
-                    Software.fileOperator.format();
+                    Software.fileOperator.disk.format();
                     cmdView.appendText("-> Format the hard disk successfully\n");
                 } else if ("cd".equals(instruction[0])) {
                     if ("..".equals(instruction[1])) {
@@ -291,7 +291,7 @@ public class MainController implements Initializable {
      * 构建目录树
      */
     public void initCatalogTree() throws Exception {
-        Catalog root = Software.fileOperator.readCatalog(2);
+        Catalog root = Software.fileOperator.disk.readCatalog(2);
 
         TreeItem<Catalog> treeItem = new MyTreeItem(root);
         catalogTreeView.setRoot(treeItem);

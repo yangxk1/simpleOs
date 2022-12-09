@@ -120,12 +120,12 @@ public class Catalog {
 
     public List<Catalog> list() throws IOException {
         List<Catalog> catalogs=new ArrayList<>();
-        Catalog catalog= Software.fileOperator.readCatalog(catalogBlock);
+        Catalog catalog= Software.fileOperator.disk.readCatalog(catalogBlock);
         int nextBlock=catalog.getStartBlock();
         while(nextBlock!=-1){
-            Catalog c= Software.fileOperator.readCatalog(nextBlock);
+            Catalog c= Software.fileOperator.disk.readCatalog(nextBlock);
             catalogs.add(c);
-            nextBlock= Software.fileOperator.getNextBlock(nextBlock);
+            nextBlock= Software.fileOperator.disk.getNextBlock(nextBlock);
         }
         return  catalogs;
     }
