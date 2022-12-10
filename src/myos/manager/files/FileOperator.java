@@ -3,6 +3,7 @@ package myos.manager.files;
 import myos.Software;
 import myos.constant.OsConstant;
 import myos.controller.MainController;
+import myos.manager.process.CPU;
 import myos.manager.process.ProcessCreator;
 
 import java.io.IOException;
@@ -548,5 +549,37 @@ public class FileOperator {
      */
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
+    }
+
+    public void gcc(String srcFilePath, String desFilePath) throws Exception {
+        if(desFilePath.length() <= 0 || desFilePath.charAt(desFilePath.length()-1) != 'e'){
+            desFilePath = desFilePath+"e";
+        }
+        OpenedFile srcFile=null,desFile=null;
+        try {
+            srcFile = open(srcFilePath, OpenedFile.OP_TYPE_READ);
+            //新文件设置为可执行文件
+            create(desFilePath, Byte.parseByte("00010000",2));
+            desFile = open(desFilePath, OpenedFile.OP_TYPE_WRITE);
+            //读取源码
+            byte[] content = read(srcFile, -1);
+            String code = new String(content);
+            //消除结束符
+            code = code.split("#")[0];
+            //源码切割
+            String[] sentences = code.split(";");
+            //语句翻译
+            byte[] machineCode = Software.cpu.getInstruction(sentences);
+            write(desFile, machineCode, machineCode.length);
+        }catch (Exception e){
+            throw e;
+        }finally {
+            if (srcFile!=null) {
+                close(srcFile);
+            }
+            if (desFile!=null){
+                close(desFile);
+            }
+        }
     }
 }

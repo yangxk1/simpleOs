@@ -121,34 +121,12 @@ public class MainController implements Initializable {
 
     }
 
-    public void loadDesk() throws Exception {
-                    String[][] instruction = {{"mov ax,50", "inc ax", "mov bx,111", "dec bx", "mov cx,23", "! a 2", "end"},
-                    {"mov ax,50", "mov dx,30", "! b 2", "dec bx", "inc dx", "mov ax 25", "end"},
-                    {"mov ax,50", "! c 3", "mov bx,111", "! c 1", "mov cx,23", "! a 1", "end"},
-                    {"mov ax,50", "inc ax", "! b 1", "! a 2", "mov cx,23", "inc cx", "inc ax", "! c 2", "end"},
-                    {"mov bx,70", "inc bx", "mov bx,12", "dec bx", "! c 3", "inc bx", "mov cx,23", "! a 1", "dec cx", "end"},
-                    {"mov ax,50", "! b 2", "mov bx,12", "! c 1", "mov cx,23", "! a 1", "mov ax,50", "inc ax", "mov bx,21", "dec bx", "mov cx,23", "! a 1", "end"},
-                    {"mov ax,50", "inc ax", "! b 1", "! a 2", "mov cx,23", "inc ax", "mov bx,122", "dec bx", "mov cx,32", "! a 1", "end"},
-                    {"mov ax,50", "inc ax", "! c 1", "mov cx,23", "! a 1", "mov bx,111", "dec bx", "mov cx,20", "! a 1", "end"},
-                    {"mov ax,50", "inc ax", "mov bx,13", "dec bx", "mov cx,23", "! a 1", "inc ax", "mov bx,112", "dec bx", "mov cx,23", "! a 1", "end"},
-                    {"mov ax,50", "inc ax", "mov bx,116", "inc ax", "mov bx,111", "dec bx", "mov cx,23", "! a 1", "dec bx", "mov cx,23", "! b 1", "end"}};
-            os.fileOperator.create("root/exe1",8);
-            for (int i = 0; i < instruction.length; i++) {
-                String path = "root/exe1/" + String.valueOf(i) + ".e";
-                os.fileOperator.create(path, 16);
-                OpenedFile open = os.fileOperator.open(path, OpenedFile.OP_TYPE_WRITE);
-                byte[] b = new CPU().getInstruction(instruction[i]);
-                os.fileOperator.write(path,new String(b),0);
-                os.fileOperator.close(open);
-            }
-    }
     public void osSwitch() throws Exception {
         if (!Software.launched) {
             launchOS();
             cmdView.setEditable(true);
             osSwitchBtn.setStyle("-fx-background-color:#e34040");
             osSwitchBtn.setText("关机");
-//            loadDesk();
         } else {
             closeOs();
             cmdView.setEditable(false);
@@ -244,7 +222,11 @@ public class MainController implements Initializable {
                         //追加写入
                         Software.fileOperator.write(instruction[1],instruction[3],0);
                     }else {
-                        Software.fileOperator.write(instruction[1],instruction[2],1);
+                        String context = instruction[2];
+                        for (int i = 3; i < instruction.length; i++) {
+                            context = context+" "+instruction[i];
+                        }
+                        Software.fileOperator.write(instruction[1],context,1);
                     }
                 } else if ("copy".equals(instruction[0])) {
                     Software.fileOperator.copy(instruction[1], instruction[2]);
@@ -263,7 +245,17 @@ public class MainController implements Initializable {
                     }
                 } else if("clear".equals(instruction[0])){
                     cmdView.setText("");
-                }else {
+                } else if ("gcc".equals(instruction[0])) {
+                    cmdView.appendText("开始编译......\n");
+                    String desPath = null;
+                    if(instruction.length > 2) {
+                       desPath = instruction[2];
+                    }else {
+                        desPath = instruction[1]+"e";
+                    }
+                    Software.fileOperator.gcc(instruction[1],desPath);
+                    cmdView.appendText("编译完成\n");
+                } else {
                     cmdView.appendText("-> "+instruction[0]+"不是内部或外部命令\n");
                 }
             } catch (Exception ex) {

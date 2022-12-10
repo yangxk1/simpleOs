@@ -1,6 +1,8 @@
 package myos.manager.files;
 
+import myos.Software;
 import myos.constant.OsConstant;
+import myos.manager.process.CPU;
 import myos.utils.ThreadPoolUtil;
 
 import java.io.*;
@@ -40,6 +42,27 @@ public class DiskDriver {
         }
     }
 
+    private static void loadDesk() throws Exception {
+        String[][] instruction = {{"mov ax,50", "inc ax", "mov bx,111", "dec bx", "mov cx,23", "! a 2", "end"},
+                {"mov ax,50", "mov dx,30", "! b 2", "dec bx", "inc dx", "mov ax 25", "end"},
+                {"mov ax,50", "! c 3", "mov bx,111", "! c 1", "mov cx,23", "! a 1", "end"},
+                {"mov ax,50", "inc ax", "! b 1", "! a 2", "mov cx,23", "inc cx", "inc ax", "! c 2", "end"},
+                {"mov bx,70", "inc bx", "mov bx,12", "dec bx", "! c 3", "inc bx", "mov cx,23", "! a 1", "dec cx", "end"},
+                {"mov ax,50", "! b 2", "mov bx,12", "! c 1", "mov cx,23", "! a 1", "mov ax,50", "inc ax", "mov bx,21", "dec bx", "mov cx,23", "! a 1", "end"},
+                {"mov ax,50", "inc ax", "! b 1", "! a 2", "mov cx,23", "inc ax", "mov bx,122", "dec bx", "mov cx,32", "! a 1", "end"},
+                {"mov ax,50", "inc ax", "! c 1", "mov cx,23", "! a 1", "mov bx,111", "dec bx", "mov cx,20", "! a 1", "end"},
+                {"mov ax,50", "inc ax", "mov bx,13", "dec bx", "mov cx,23", "! a 1", "inc ax", "mov bx,112", "dec bx", "mov cx,23", "! a 1", "end"},
+                {"mov ax,50", "inc ax", "mov bx,116", "inc ax", "mov bx,111", "dec bx", "mov cx,23", "! a 1", "dec bx", "mov cx,23", "! b 1", "end"}};
+        Software.getInstance().fileOperator.create("root/exe",8);
+        for (int i = 0; i < instruction.length; i++) {
+            String path = "root/exe/" + String.valueOf(i) + ".e";
+            Software.getInstance().fileOperator.create(path, 16);
+            OpenedFile open = Software.getInstance().fileOperator.open(path, OpenedFile.OP_TYPE_WRITE);
+            byte[] b = new CPU().getInstruction(instruction[i]);
+            Software.getInstance().fileOperator.write(path,new String(b),0);
+            Software.getInstance().fileOperator.close(open);
+        }
+    }
     /**
      * 初始化
      */
@@ -87,6 +110,7 @@ public class DiskDriver {
                 }
                 fout.write(bytes);
             }
+            loadDesk();
         } catch (FileNotFoundException e) {
             System.out.println("磁盘文件异常");
             e.printStackTrace();
@@ -95,6 +119,8 @@ public class DiskDriver {
             System.out.println("磁盘IO异常");
             e.printStackTrace();
             exit(0);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             if (fout != null) {
                 try {
