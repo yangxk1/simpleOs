@@ -18,8 +18,12 @@ import java.util.concurrent.TimeUnit;
 import static myos.constant.OsConstant.DISK_BLOCK_QUNTITY;
 import static myos.constant.OsConstant.DISK_BLOCK_SIZE;
 
+
 /**
- * Created by lindanpeng on 2017/12/28.
+ * 设备管理器
+ *
+ * @author WTDYang
+ * @date 2022/12/10
  */
 public class DeviceManager{
     private CPU cpu;

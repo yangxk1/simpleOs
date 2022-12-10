@@ -19,9 +19,10 @@ public class Memory {
      * 内存分配表(虚拟内存)
      */
     private List<SubArea> subAreas;
-    /*    //空闲进程控制块
-    private Queue<PCB> freePCB;*/
-    //就绪进程控制块
+
+    /**
+     * 就绪进程控制块
+     */
     private Queue<PCB> waitPCB;
     /**
      * 阻塞进程控制块

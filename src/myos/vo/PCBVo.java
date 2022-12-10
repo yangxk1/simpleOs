@@ -3,8 +3,12 @@ package myos.vo;
 import javafx.beans.property.SimpleStringProperty;
 import myos.manager.process.PCB;
 
+
 /**
- * Created by lindanpeng on 2017/12/30.
+ * 进程视图
+ *
+ * @author WTDYang
+ * @date 2022/12/10
  */
 public class PCBVo {
     private SimpleStringProperty PID;

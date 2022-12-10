@@ -7,7 +7,10 @@ import myos.manager.files.Catalog;
 import java.io.IOException;
 
 /**
- * Created by lindanpeng on 2017/12/29.
+ * 目录树视图
+ *
+ * @author WTDYang
+ * @date 2022/12/10
  */
 public class MyTreeItem extends TreeItem<Catalog>{
     private boolean notInitialized = true;

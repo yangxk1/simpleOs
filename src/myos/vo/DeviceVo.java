@@ -3,7 +3,7 @@ package myos.vo;
 import javafx.beans.property.SimpleStringProperty;
 
 /**
- * 设备签证官
+ * 设备视图
  * @author WTDYang
  * @date 2022/12/04
  */

@@ -12,6 +12,12 @@ import myos.utils.ThreadPoolUtil;
 
 import java.io.*;
 
+/**
+ * 软件
+ *
+ * @author WTDYang
+ * @date 2022/12/10
+ */
 @SuppressWarnings("all")
 public class Software {
     /**

@@ -12,7 +12,7 @@ import myos.controller.MainController;
 
 
 /**
- * 主要
+ * Main启动入口
  *
  * @author WTDYang
  * @date 2022/12/06
