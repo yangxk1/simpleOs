@@ -189,12 +189,17 @@ public class FileOperator {
      */
     public void write(String filePath, String data,int type) throws Exception {
         OpenedFile openedFile = open(filePath,OpenedFile.OP_TYPE_WRITE);
-        byte[] buffer = data.getBytes();
-        if (type == 1) {
-            write(openedFile, buffer, buffer.length);
-        }else {
-            append(openedFile,buffer,buffer.length);
+        try {
+            byte[] buffer = data.getBytes();
+            if (type == 1) {
+                write(openedFile, buffer, buffer.length);
+            }else {
+                append(openedFile,buffer,buffer.length);
+            }
+        }finally {
+            close(openedFile);
         }
+
     }
 
     /**

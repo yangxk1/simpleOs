@@ -196,9 +196,6 @@ public class MainController implements Initializable {
                 } else if ("delete".equals(instruction[0])) {
                     Software.fileOperator.delete(instruction[1]);
                     cmdView.appendText("-> File deleted successfully\n");
-                } else if ("type".equals(instruction[0])) {
-                    String content = Software.fileOperator.type(instruction[1]);
-                    cmdView.appendText(content + "\n");
                 } else if ("mkdir".equals(instruction[0])) {
                     Software.fileOperator.mkdir(instruction[1]);
                     cmdView.appendText("-> Directory created successfully\n");
